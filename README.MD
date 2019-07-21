@@ -15,7 +15,10 @@ GameLoopFrame.loop("Game Demo", 800, 450, Color.black, new MyGame());
 Concentrate on your game containing the three major aspects:
 input handling, game state update and rendering which is called each frame of 30 frames in a second.
 ```java
+//hello world game
 public class MyGame implements Game {
+
+    private GameLoop gameLoop;
 
     /**
      * Store your game state using class attributes here.
@@ -27,7 +30,7 @@ public class MyGame implements Game {
      */
     @Override
     public void init(GameLoop gameLoop) {
-
+        this.gameLoop = gameLoop;
     }
 
     /**
@@ -35,7 +38,11 @@ public class MyGame implements Game {
      */
     @Override
     public void input(Keyboard keyboard, Mouse mouse) {
-
+        //close when escape is pressed
+        if (keyboard.pressed(KeyEvent.VK_ESCAPE)) {
+            gameLoop.close();
+            return;
+        }
     }
 
     /**
@@ -57,7 +64,7 @@ public class MyGame implements Game {
 }
 ```
 
-## Game Making Tutorial
+## Using JASGL
 
 Below some sections about game making and usage of this library.
 If you have special requirements and can not reuse implemented classes,
@@ -150,3 +157,67 @@ A positioner moves `Sprite`s in the game, maybe based on input.
 * *`Positioner`* changes positions of given sprites. Can also start and stop animation based on positioning (e.g. walking).
   * `RpgMakerCharPositioner` works like the one implemented in rpg maker. Moves the character left,up,right,down
      in a grid. While walking the correct animation of a `RpgMakerCharSprite` is played.
+
+### Map
+
+![Map](img/map.png)
+
+A map (or level) is the world where your sprites will be placed.
+Building a map is easier with an editor where you can "draw" your levels.
+I recommend to use [Tiled](https://www.mapeditor.org/) a map editor for tile-based maps.
+
+#### Tileset
+
+![Tileset](img/tileset.png)
+
+Like a spritesheet is a set of sprites, a tileset is a set of tiles (building blocks).
+You "draw" the map by reusing and arranging the tiles to create an interesting level.
+In [Tiled](https://www.mapeditor.org/) you can load tileset images and create a tileset (has file extension `*.tsx`).
+The tileset is XML-based and stores a relative path to the image file.
+Individual tiles can have string, int, float, boolean, file and color typed key-value-based properties.
+
+#### Map with Layers
+
+[Tiled](https://www.mapeditor.org/) allows you to create a map (file extension `*.tmx`) with multiple tile layers.
+This map format is also XML-based and stores relative paths to tilesets.
+One layer can use multiple tilesets.
+
+![ISO-Vs-Ortho](img/iso-vs-ortho.png)
+
+Usually, one of the two perspectives are used to render a map: isometric or orthogonal.
+
+#### Objects
+
+There are object layers that contain a set of objects instead of tiles.
+This can be used to define where sprites should be placed or events should be triggered.
+
+#### Maps in JASGL
+
+[Tiled](https://www.mapeditor.org/) has a library called [libtiled](https://mvnrepository.com/artifact/org.mapeditor/libtiled) to read and render maps in Java.
+JASGL uses this library and adds some utlity functions. In order to avoid name clashes with `Map` we call the
+base class in JASGL `LevelMap`.
+
+* *`LevelMap`* is the base class of all maps and just states that is can be rendered layer-wise. If you want to create your own map,
+you can inherit from this class.
+  * `TiledOrthogonalLevelMap` represents an orthogonal map created by [Tiled](https://www.mapeditor.org/) map editor.
+
+```java
+public MyGame() {
+    TiledOrthogonalLevelMap lvl01 = new TiledOrthogonalLevelMap(new File("/path/to/lvl01.tmx"));
+
+    //access map data
+    TileLayer foreground = lvl01.getTileLayerByName("foreground");
+    ObjectGroup npcs = lvl01.getObjectGroupByName("NPCs");
+    MapObject enemy01 = lvl01.getMapObjectByName(npcs, "enemy01");
+}
+
+@Override
+public void render(Graphics2D g) {
+    //render all layers
+    lvl01.render(null, g);
+    //or render layer-wise
+    lvl01.render("background", g);
+    //here: render something in between the layers
+    lvl01.render("foreground", g);
+}
+```

@@ -14,4 +14,12 @@
     
     <name>Java AWT/Swing Game Library</name>
     <description>Game Library purely written in Java by using AWT/Swing canvas rendering</description>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.mapeditor</groupId>
+            <artifactId>libtiled</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+    </dependencies>
 </project>

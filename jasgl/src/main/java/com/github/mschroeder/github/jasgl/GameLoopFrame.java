@@ -323,6 +323,8 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
 
     //render with canvas and double buffer
     private void render(Graphics2D g) {
+        g.setClip(0, 0, canvas.getWidth(), canvas.getHeight());
+        
         //background
         if(background != null) {
             g.setColor(background);

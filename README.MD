@@ -221,3 +221,72 @@ public void render(Graphics2D g) {
     lvl01.render("foreground", g);
 }
 ```
+
+### Game States
+
+![Game States](img/states.png)
+
+When you have more than one game state you can use the `GameMultiplexer` class.
+This is helpful when you want to switch between menu and gameplay, for example.
+
+* `GameMultiplexer` manages multiple games and let them switch between them.
+   Because `GameMultiplexer` extends `Game` you could structure them recursively.
+   `GameState`s can also instantiate new games on demand.
+* *`Game`*: the basic game class with the three major aspects: input handling, game state update and rendering.
+  * *`GameState`* also adds methods for accessing `GameMultiplexer` as well as entering and leaving the state.
+
+Example usage of the `GameMultiplexer`:
+```java
+GameMultiplexer gameMultiplexer = new GameMultiplexer();
+gameMultiplexer.addGame("1", new GameState1());
+gameMultiplexer.addGame("2", new GameState2());
+gameMultiplexer.switchTo("1");
+
+GameLoopFrame.loop("Multi Game Demo", 800, 450, Color.white, gameMultiplexer);
+```
+
+```java
+private class GameState1 implements GameState {
+
+    private GameLoop gameLoop;
+    private GameMultiplexer gameMultiplexer;
+
+    @Override
+    public void init(GameMultiplexer gameMultiplexer) {
+        this.gameMultiplexer = gameMultiplexer;
+    }
+
+    @Override
+    public void init(GameLoop gameLoop) {
+        this.gameLoop = gameLoop;
+    }
+
+    @Override
+    public void enter(String predecessorName, Game predecessor) {
+        //when entering this game state
+    }
+
+    @Override
+    public void leave(String successorName, Game successor) {
+        //before leaving this game state
+    }
+
+    @Override
+    public void input(Keyboard keyboard, Mouse mouse) {
+        //switch to second game state when right arrow is pressed
+        if(keyboard.pressed(KeyEvent.VK_RIGHT)) {
+            gameMultiplexer.switchTo("2");
+        }
+        //close game when escape is pressed
+        if(keyboard.pressed(KeyEvent.VK_ESCAPE)) {
+            gameLoop.close();
+        }
+    }
+
+    //(...)
+}
+
+private class GameState2 implements GameState {
+    //(...)
+}
+```

@@ -8,7 +8,6 @@ import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.ObjectGroup;
 import org.mapeditor.core.TileLayer;
-import org.mapeditor.io.TMXMapReader;
 import org.mapeditor.view.OrthogonalRenderer;
 
 /**
@@ -18,7 +17,7 @@ import org.mapeditor.view.OrthogonalRenderer;
  */
 public class TiledOrthogonalLevelMap extends LevelMap {
 
-    private TMXMapReader reader;
+    private CustomTMXMapReader reader;
     private org.mapeditor.core.Map map;
     private OrthogonalRenderer orthogonalRenderer;
     
@@ -28,7 +27,7 @@ public class TiledOrthogonalLevelMap extends LevelMap {
      */
     public TiledOrthogonalLevelMap(File tmxFile) {
         long start = System.currentTimeMillis();
-        reader = new TMXMapReader();
+        reader = new CustomTMXMapReader();
         try {
             map = reader.readMap(tmxFile.getAbsolutePath());
             orthogonalRenderer = new OrthogonalRenderer(map);
@@ -45,8 +44,17 @@ public class TiledOrthogonalLevelMap extends LevelMap {
      * @param resourcePath path to the tmx file in the resources.
      */
     public TiledOrthogonalLevelMap(String resourcePath) {
-        //TODO
-        throw new RuntimeException("not implemented yet");
+        long start = System.currentTimeMillis();
+        reader = new CustomTMXMapReader();
+        try {
+            map = reader.readMapFromResources(resourcePath);
+            orthogonalRenderer = new OrthogonalRenderer(map);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        long end = System.currentTimeMillis();
+        
+        //System.out.println("load map " + tmxFile.getName() + " in " + (end - start) + " ms");
     }
     
     /**

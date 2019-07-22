@@ -204,6 +204,8 @@ you can inherit from this class.
 ```java
 public MyGame() {
     TiledOrthogonalLevelMap lvl01 = new TiledOrthogonalLevelMap(new File("/path/to/lvl01.tmx"));
+    //or from maven's src/main/resources
+    //TiledOrthogonalLevelMap lvl01 = new TiledOrthogonalLevelMap("/resource/path/to/lvl01.tmx");
 
     //access map data
     TileLayer foreground = lvl01.getTileLayerByName("foreground");

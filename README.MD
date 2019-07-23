@@ -224,6 +224,47 @@ public void render(Graphics2D g) {
 }
 ```
 
+### Camera
+
+![Camera](img/camera.png)
+
+Usually, the map is larger than the screen. Using a camera you can move the view port or
+follow a sprite.
+
+* *`Camera`* is the base class and contains the offset which can be changed to move
+  the view port. Implementations decide how the offset is changed.
+  * `SpriteCamera` is a camera that follows a given sprites.
+
+```java
+private SpriteCamera camera;
+
+public MyGame() {
+    //...
+    camera = new SpriteCamera();
+    camera.setSprite(sprite);
+}
+
+@Override
+public void init(GameLoop gameLoop) {
+    //camera can access screen size
+    camera.init(gameLoop);
+}
+
+@Override
+public void update(double ms) {
+    //update offset (after sprite was moved)
+    camera.update(ms);
+}
+
+@Override
+public void render(Graphics2D g) {
+    //translate view port
+    camera.render(g);
+    //...
+    camera.reset(g);
+}
+```
+
 ### Game States
 
 ![Game States](img/states.png)

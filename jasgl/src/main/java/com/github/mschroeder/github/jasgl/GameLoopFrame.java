@@ -1,6 +1,7 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
@@ -369,6 +370,11 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     @Override
     public int frame() {
         return frame;
+    }
+    
+    @Override
+    public Dimension getScreenSize() {
+        return canvas.getSize();
     }
     
     //run a game in the loop

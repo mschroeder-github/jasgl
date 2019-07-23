@@ -1,14 +1,14 @@
 package com.github.mschroeder.github.jasgl;
 
+import com.github.mschroeder.github.jasgl.Utils.Direction;
 import java.awt.Point;
 import java.util.LinkedList;
-import com.github.mschroeder.github.jasgl.Utils.Direction;
 
 /**
  * A positioner that works like the one rpg maker implemented.
  * @author Markus Schr&ouml;der
  */
-public class RpgMakerCharPositioner extends Positioner {
+public class RpgMakerCharPositioner extends InputBasedPositioner {
     
     
     private LinkedList<Integer> keyCodes = new LinkedList<>();
@@ -21,8 +21,10 @@ public class RpgMakerCharPositioner extends Positioner {
     /**
      * Use the arrow keys to walk the given sprites.
      * @param keyboard 
+     * @param mouse 
      */
-    public void input(Keyboard keyboard) {
+    @Override
+    public void input(Keyboard keyboard, Mouse mouse) {
         for(Integer keyCode : Utils.ARROWS) {
             if(keyboard.pressed(keyCode)) {
                 keyCodes.addFirst(keyCode);

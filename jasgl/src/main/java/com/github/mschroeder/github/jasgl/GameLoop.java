@@ -1,5 +1,7 @@
 package com.github.mschroeder.github.jasgl;
 
+import java.awt.Dimension;
+
 /**
  * Interface for accessing GameLoop from Game.
  * GameLoopFrame impls this.
@@ -23,5 +25,11 @@ public interface GameLoop {
      * @return 
      */
     public int frame();
+    
+    /**
+     * Current size of the screen (canvas) where everything is rendered.
+     * @return 
+     */
+    public Dimension getScreenSize();
     
 }

@@ -10,10 +10,10 @@ import java.util.List;
  */
 public class SpriteSheetSprite extends Sprite {
 
-    private SpriteSheet sheet;
-    private FrameAnimator animator;
+    protected SpriteSheet sheet;
+    protected FrameAnimator animator;
     
-    private String animation;
+    protected String animation;
     
     public SpriteSheetSprite(SpriteSheet sheet, FrameAnimator animator) {
         this.sheet = sheet;
@@ -24,7 +24,7 @@ public class SpriteSheetSprite extends Sprite {
      * Sets the animation named in the {@link SpriteSheet}.
      * @param animation 
      */
-    public void set(String animation) {
+    public void setAnimation(String animation) {
         this.animation = animation;
     }
     
@@ -47,7 +47,7 @@ public class SpriteSheetSprite extends Sprite {
      * @param animation 
      */
     public void play(String animation) {
-        set(animation);
+        setAnimation(animation);
         play();
     }
     

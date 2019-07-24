@@ -61,6 +61,7 @@ public abstract class TiledGame implements Game {
     public void init(GameLoop gameLoop) {
         this.gameLoop = gameLoop;
         playerSpriteCamera.init(gameLoop);
+        playerSpriteCamera.update(0);
     }
 
     @Override

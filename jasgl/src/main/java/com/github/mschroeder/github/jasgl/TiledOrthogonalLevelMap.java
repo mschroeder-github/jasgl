@@ -84,6 +84,20 @@ public class TiledOrthogonalLevelMap extends LevelMap {
         }
         return result;
     }
+    
+    /**
+     * Lists all object groups in the map.
+     * @return 
+     */
+    public List<ObjectGroup> getObjectGroups() {
+        List<ObjectGroup> result = new ArrayList<>();
+        for (MapLayer layer : map.getLayers()) {
+            if (layer instanceof ObjectGroup) {
+                result.add((ObjectGroup) layer);
+            }
+        }
+        return result;
+    }
 
     /**
      * Finds an object group (layer) by name.

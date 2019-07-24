@@ -3,6 +3,7 @@ package com.github.mschroeder.github.jasgl;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 /**
@@ -36,7 +37,17 @@ public class ListOfSprites extends ArrayList<Sprite> {
         }
     }
     
+    /**
+     * Renders the sprites.
+     * @param g
+     * @param sortByY if true, sorts by y-coordinate to have correct draw order
+     */
     public void render(Graphics2D g, boolean sortByY) {
+        if(sortByY) {
+            Collections.sort(this, (a, b) -> {
+                return Double.compare(a.pos.y, b.pos.y);
+            });
+        }
         for(Sprite s : this) {
             s.render(g);
         }

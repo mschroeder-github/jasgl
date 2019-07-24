@@ -10,13 +10,25 @@ import java.util.LinkedList;
  */
 public class RpgMakerCharPositioner extends InputBasedPositioner {
     
-    
     private LinkedList<Integer> keyCodes = new LinkedList<>();
 
     private int movingKeyCode;
     private boolean moving;
     private double movedDistance;
-    private double maxDistance = 32.0;
+    
+    //settings
+    private double stepDistance;
+    private double pixelPerSecondSpeed;
+
+    public RpgMakerCharPositioner() {
+        this.stepDistance = 32.0;
+        this.pixelPerSecondSpeed = 96.0;
+    }
+    
+    public RpgMakerCharPositioner(double stepDistance, double pixelPerSecondSpeed) {
+        this.stepDistance = stepDistance;
+        this.pixelPerSecondSpeed = pixelPerSecondSpeed;
+    }
     
     /**
      * Use the arrow keys to walk the given sprites.
@@ -60,8 +72,8 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         
         //only if moving
         if(moving) {
-            double speed = (1/15.0);
-            double distance = ms * speed;
+            double pixelPerMilliSpeed = pixelPerSecondSpeed / 1000;
+            double distance = ms * pixelPerMilliSpeed;
             
             //dir
             Point.Double dirVec = Utils.directionVector(movingKeyCode);
@@ -74,7 +86,7 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
             
             //the moved distance
             movedDistance += distance;
-            if(movedDistance > maxDistance) {
+            if(movedDistance > stepDistance) {
                 //new init
                 movedDistance = 0;
                 moving = continueMoving();

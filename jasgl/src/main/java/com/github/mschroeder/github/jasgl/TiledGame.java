@@ -29,6 +29,13 @@ public abstract class TiledGame implements Game {
         this.map = map;
         
         this.sprites = new ListOfSprites();
+        
+        //level map to sprites
+        for(ObjectGroup og : map.getObjectGroups()) {
+            for(MapObject mo : og.getObjects()) {
+                loadSprite(og, mo, sprites);
+            }
+        }
     }
     
     /**
@@ -66,6 +73,10 @@ public abstract class TiledGame implements Game {
         playerSpritePositioner.update(ms);
         sprites.update(ms);
         playerSpriteCamera.update(ms);
+    }
+
+    public ListOfSprites getSprites() {
+        return sprites;
     }
     
 }

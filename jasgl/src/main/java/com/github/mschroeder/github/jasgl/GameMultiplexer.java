@@ -38,6 +38,10 @@ public class GameMultiplexer implements Game {
         return this;
     }
     
+    public Game getGame(String name) {
+        return name2game.get(name);
+    }
+    
     /**
      * Switch to another registered game.
      * @param nameOfGame 

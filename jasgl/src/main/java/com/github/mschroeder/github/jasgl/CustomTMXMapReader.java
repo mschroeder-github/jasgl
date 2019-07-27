@@ -252,11 +252,14 @@ public class CustomTMXMapReader {
             InputStream in;
             
             if(fromResources) {
-                in = CustomTMXMapReader.class.getResourceAsStream(filename);
+                in = CustomTMXMapReader.class.getResourceAsStream(ensureStartingSlash(filename));
             } else {
                 in = new URL(makeUrl(filename)).openStream();
-               
             }
+            if(in == null) {
+                throw new RuntimeException("unmarshalTileset: " + filename);
+            }
+            
             TileSet ext = unmarshalTilesetFile(in, filename);
             
             if (ext == null) {
@@ -331,7 +334,7 @@ public class CustomTMXMapReader {
                         if(fromResources) {
                             //work around
                             File tmp = File.createTempFile("CustomTMXMapReader", ".image");
-                            FileUtils.writeByteArrayToFile(tmp, IOUtils.toByteArray(CustomTMXMapReader.class.getResourceAsStream(sourcePath)));
+                            FileUtils.writeByteArrayToFile(tmp, IOUtils.toByteArray(CustomTMXMapReader.class.getResourceAsStream(ensureStartingSlash(sourcePath))));
                             
                             //load from temp file
                             set.importTileBitmap(tmp.getAbsolutePath(), new BasicTileCutter(
@@ -981,5 +984,12 @@ public class CustomTMXMapReader {
      */
     private Entry<Integer, TileSet> findTileSetForTileGID(int gid) {
         return tilesetPerFirstGid.floorEntry(gid);
+    }
+    
+    private String ensureStartingSlash(String filename) {
+        if(!filename.startsWith("/")) {
+            filename = "/" + filename;
+        }
+        return filename;
     }
 }

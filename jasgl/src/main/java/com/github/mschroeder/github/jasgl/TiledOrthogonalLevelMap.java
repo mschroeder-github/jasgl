@@ -3,6 +3,7 @@ package com.github.mschroeder.github.jasgl;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
@@ -129,6 +130,21 @@ public class TiledOrthogonalLevelMap extends LevelMap {
         return null;
     }
 
+    /**
+     * Lists all map objects from all object groups (layers).
+     * @return 
+     */
+    public List<MapObject> getMapObjects() {
+        List<MapObject> l = new ArrayList<>();
+        for(ObjectGroup og : getObjectGroups()) {
+            Iterator<MapObject> iter = og.iterator();
+            while(iter.hasNext()) {
+                l.add(iter.next());
+            }
+        }
+        return l;
+    }
+    
     /**
      * Get tiles from all layers at position x,y.
      * @param x

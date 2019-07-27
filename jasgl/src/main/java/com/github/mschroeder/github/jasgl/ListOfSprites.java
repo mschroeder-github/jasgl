@@ -23,6 +23,16 @@ public class ListOfSprites extends ArrayList<Sprite> {
         super(c);
     }
     
+    /**
+     * Adds the sprite only if it is absent.
+     * @param sprite 
+     */
+    public void addIfAbsent(Sprite sprite) {
+        if(!contains(sprite)) {
+            add(sprite);
+        }
+    }
+    
     public <T> void forEach(Class<T> t, Consumer<T> c) {
         for(Sprite s : this) {
             if(t.isAssignableFrom(s.getClass())) {

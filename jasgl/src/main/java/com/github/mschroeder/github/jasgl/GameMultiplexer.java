@@ -1,8 +1,12 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * With the game multiplexer you can switch in your game between many game states.
@@ -114,4 +118,11 @@ public class GameMultiplexer implements Game {
         return name != null && name2game.containsKey(name);
     }
     
+    public List<Game> getGames() {
+        return new ArrayList<>(name2game.values());
+    }
+    
+    public Set<Entry<String, Game>> getNamedGames() {
+        return name2game.entrySet();
+    }
 }

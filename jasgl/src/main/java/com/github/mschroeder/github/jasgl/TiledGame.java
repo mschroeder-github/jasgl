@@ -47,6 +47,8 @@ public abstract class TiledGame implements Game {
         playerSpritePositioner.sprites.add(sprite);
         
         playerSpriteCamera.setSprite(sprite);
+        
+        sprites.addIfAbsent(sprite);
     }
     
     /**

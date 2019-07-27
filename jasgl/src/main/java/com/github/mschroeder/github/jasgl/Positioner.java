@@ -24,5 +24,6 @@ public abstract class Positioner {
     public ListOfSprites getSprites() {
         return sprites;
     }
+
     
 }

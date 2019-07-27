@@ -3,14 +3,14 @@ package com.github.mschroeder.github.jasgl;
 import com.github.mschroeder.github.jasgl.Utils.Direction;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.geom.Area;
 import java.util.List;
 
 /**
  *
  * @author Markus Schr&ouml;der
  */
-public class RpgMakerCharSprite extends SpriteSheetSprite implements Pivotable, Shapeable {
+public class RpgMakerCharSprite extends SpriteSheetSprite implements Pivotable {
     
     private int charIndex;
     
@@ -37,8 +37,8 @@ public class RpgMakerCharSprite extends SpriteSheetSprite implements Pivotable, 
     }
 
     @Override
-    public Shape getShape() {
-        return new Rectangle.Double(pos.x, pos.y, 32, 32);
+    public Area getArea() {
+        return new Area(new Rectangle.Double(pos.x, pos.y, 32, 32));
     }
     
     @Override

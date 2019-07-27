@@ -24,4 +24,24 @@ public class GraphicsUtil {
             null);
     }
     
+    /**
+     * Draws a cross with bounds of rectangle.
+     * @param g
+     * @param src 
+     */
+    public static void drawCross(Graphics2D g, Rectangle src) {
+        g.drawLine(
+                (int)(src.getX() + (src.getWidth()/2.0)),
+                src.y, 
+                (int)(src.getX() + (src.getWidth()/2.0)), 
+                src.y + src.height
+        );
+        g.drawLine(
+                src.x,
+                (int)(src.getY() + (src.getHeight()/2.0)), 
+                src.x + src.width, 
+                (int)(src.getY() + (src.getHeight()/2.0))
+        );
+    }
+    
 }

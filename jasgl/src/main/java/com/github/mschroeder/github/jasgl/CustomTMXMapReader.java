@@ -352,6 +352,7 @@ public class CustomTMXMapReader {
                     } else {
                         Tile myTile = set.getTile(tile.getId());
                         myTile.setProperties(tile.getProperties());
+                        myTile.setType(tile.getType());
                         //TODO: there is the possibility here of overlaying images,
                         //      which some people may want
                     }
@@ -505,7 +506,15 @@ public class CustomTMXMapReader {
             error = "Failed creating tile: " + e.getLocalizedMessage();
             return tile;
         }
-
+        
+        if(tile.getId() == 253) {
+            int a = 0;
+        }
+        
+        //Markus Schröder: type set
+        final String type = getAttributeValue(t, "type");
+        tile.setType(type);
+        
         tile.setTileSet(set);
 
         for (int i = 0; i < children.getLength(); i++) {

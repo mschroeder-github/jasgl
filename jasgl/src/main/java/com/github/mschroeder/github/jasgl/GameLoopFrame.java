@@ -5,9 +5,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +39,8 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     private int frame = 0;
     
     private boolean running = true;
+    
+    private Object inputLock = new Object();
 
     public GameLoopFrame(String title, int w, int h, Color background, Game game) {
         initComponents();
@@ -68,6 +72,15 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
         
         
         canvas.createBufferStrategy(2);
+        
+        //TODO make it a constructor flag
+        boolean hideCursor = false;
+        if(hideCursor) {
+            canvas.setCursor( canvas.getToolkit().createCustomCursor(
+                   new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ),
+                   new Point(),
+                   null ) );
+        }
     }
     
     private Queue<KeyEvent> keyEventQueue = new ConcurrentLinkedQueue<>();
@@ -162,20 +175,22 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     
     private InternalKeyboard internalKeyboard = new InternalKeyboard();
     private void globalKeyboardEventProcessing(KeyEvent evt) {
-        switch(evt.getID()) {
-            case KeyEvent.KEY_TYPED: return;
-            case KeyEvent.KEY_PRESSED:
-                if(!internalKeyboard.pressed[evt.getKeyCode()]) {
-                    internalKeyboard.pressed[evt.getKeyCode()] = true;
+        synchronized(inputLock) {
+            //the pressed event comes often because of auto repeat
+            switch(evt.getID()) {
+                case KeyEvent.KEY_TYPED: return;
+                case KeyEvent.KEY_PRESSED:
+                    if(!internalKeyboard.pressed[evt.getKeyCode()]) {
+                        internalKeyboard.pressed[evt.getKeyCode()] = true;
+                        keyEventQueue.add(evt);
+                    }
+                    break;
+                case KeyEvent.KEY_RELEASED:
+                    //release comes one once the key is released
                     keyEventQueue.add(evt);
-                }
-                break;
-            case KeyEvent.KEY_RELEASED: 
-                if(internalKeyboard.pressed[evt.getKeyCode()]) {
                     internalKeyboard.pressed[evt.getKeyCode()] = false;
-                    keyEventQueue.add(evt);
-                }
-                break;
+                    break;
+            }
         }
     }
     private class InternalKeyboard implements Keyboard {
@@ -224,26 +239,28 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
                     
                     begin = System.nanoTime();
 
-                    //all key events in this frame
-                    internalKeyboard.keyEvents.clear();
-                    internalKeyboard.keyEvents.addAll(keyEventQueue);
-                    
-                    //all mouse events in this frame
-                    internalMouse.mouseEvents.clear();
-                    internalMouse.mouseEvents.addAll(mouseEventQueue);
+                    synchronized(inputLock) {
+                        //all key events in this frame
+                        internalKeyboard.keyEvents.clear();
+                        internalKeyboard.keyEvents.addAll(keyEventQueue);
 
-                    //game changes state based on input
-                    try {
-                        game.input(internalKeyboard, internalMouse);
-                    } catch(Exception e) {
-                        e.printStackTrace();
-                        running = false;
-                        continue;
+                        //all mouse events in this frame
+                        internalMouse.mouseEvents.clear();
+                        internalMouse.mouseEvents.addAll(mouseEventQueue);
+
+                        //game changes state based on input
+                        try {
+                            game.input(internalKeyboard, internalMouse);
+                        } catch(Exception e) {
+                            e.printStackTrace();
+                            running = false;
+                            continue;
+                        }
+
+                        //clear queue to have 
+                        keyEventQueue.clear();
+                        mouseEventQueue.clear();
                     }
-
-                    //clear queue to have 
-                    keyEventQueue.clear();
-                    mouseEventQueue.clear();
                     
                     end = System.nanoTime();
                     elapsed = end - begin;
@@ -406,17 +423,7 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
                 formWindowClosing(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(canvas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        getContentPane().add(canvas, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

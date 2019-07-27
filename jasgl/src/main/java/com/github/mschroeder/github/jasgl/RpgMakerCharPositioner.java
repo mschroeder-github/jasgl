@@ -2,8 +2,12 @@ package com.github.mschroeder.github.jasgl;
 
 import com.github.mschroeder.github.jasgl.Utils.Direction;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,7 +17,15 @@ import java.util.Map.Entry;
  * @author Markus Schr&ouml;der
  */
 public class RpgMakerCharPositioner extends InputBasedPositioner {
-
+    
+    /**
+     * The positioner can check if the sprites that will be moved will intersect
+     * something. If this is the case, the positioner is not allowed to move them.
+     */
+    //protected SpritesTiledMapIntersectioner intersectioner;
+    
+    private List<CollisionDecisionMaker> collisionDecisionMakers;
+    
     private LinkedList<Integer> keyCodes = new LinkedList<>();
 
     private int movingKeyCode;
@@ -37,6 +49,8 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         this.pixelPerSecondSpeed = pixelPerSecondSpeed;
         double pixelPerMilliSpeed = pixelPerSecondSpeed / 1000;
         double durationMillis = stepDistance / pixelPerMilliSpeed;
+        
+        collisionDecisionMakers = new ArrayList<>();
     }
 
     /**
@@ -49,11 +63,13 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
     public void input(Keyboard keyboard, Mouse mouse) {
         //check arrows
         for (Integer keyCode : Utils.ARROWS) {
+            if (keyboard.released(keyCode)) {
+                keyCodes.removeIf(kc -> kc == keyCode);
+            }
+        }
+        for (Integer keyCode : Utils.ARROWS) {
             if (keyboard.pressed(keyCode)) {
                 keyCodes.addFirst(keyCode);
-            }
-            if (keyboard.released(keyCode)) {
-                keyCodes.removeFirstOccurrence(keyCode);
             }
         }
 
@@ -68,7 +84,7 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         }
 
         //a key is pressed and we are not moving and map allows it
-        if (continueMoving(direction) && !moving) {
+        if (continueMoving() && !moving) {
             //init the moving
             movedDistance = 0;
             //now update() method will do something
@@ -109,7 +125,7 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
             }
             
             //if allowed, moving is still true
-            moving = continueMoving(direction);
+            moving = continueMoving();
             
             //if not stop animation
             if (!moving) {
@@ -132,10 +148,37 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
     }
 
     //if no key is pressed stop moving
-    //TODO here you have to check if sprite collides in map (need direction)
-    private boolean continueMoving(Direction direction) {
-
-        return !keyCodes.isEmpty();
+    private boolean continueMoving() {
+        
+        //no key pressed: no moving
+        if(keyCodes.isEmpty()) {
+            return false;
+        }
+        
+        //collision detected: no moving
+        if(!collisionDecisionMakers.isEmpty()) {
+            for(Entry<Sprite, Movement> e : sprite2movement.entrySet()) {
+                RpgMakerCharSprite sprite = (RpgMakerCharSprite) e.getKey();
+                
+                Point.Double delta = e.getValue().getDelta();
+                
+                //where the sprite will be
+                Area translated = sprite.getArea()
+                .createTransformedArea(
+                        AffineTransform.getTranslateInstance(delta.x, delta.y)
+                );
+                
+                //if one sprite collides once: whole moving is stopped
+                for(CollisionDecisionMaker cdm : collisionDecisionMakers) {
+                    if(cdm.collides(sprite, translated)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        //else continue moving
+        return true;
     }
     
     private class Movement {
@@ -154,6 +197,14 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
             return start + "->" + end;
         }
         
+        public Point.Double getDelta() {
+            return new Point.Double(end.x - start.x, end.y - start.y);
+        }
+        
     }
-    
+
+    public List<CollisionDecisionMaker> getCollisionDecisionMakers() {
+        return collisionDecisionMakers;
+    }
+
 }

@@ -136,7 +136,7 @@ A `SpriteSheet` gives a sequence of subimages a name (e.g. "killed" are the imag
 Sprites can implement interfaces when they have certain behavior.
 
 * *`Pivotable`*: sprites have a direction (left,up,right,down) which can be changed. This can be used by a `Positioner`.
-
+* *`Areaable`*: By default, sprites have a position point. Use this interface to specify an area they occupy in space.
 
 ### Animator
 
@@ -157,6 +157,31 @@ A positioner moves `Sprite`s in the game, maybe based on input.
 * *`Positioner`* changes positions of given sprites. Can also start and stop animation based on positioning (e.g. walking).
   * `RpgMakerCharPositioner` works like the one implemented in rpg maker. Moves the character left,up,right,down
      in a grid. While walking the correct animation of a `RpgMakerCharSprite` is played.
+
+### Intersection & Collision
+
+![Intersection & Collision](img/colandintersec.png)
+
+* `Intersectioner` is used to calculate if something intersects another thing.
+  * `LevelMapIntersectioner` takes a `TiledOrthogonalLevelMap` and checks what tiles are intersectioned.
+* `CollisionDecisionMaker` is used to specify when a sprite collides with something.
+* `LevelMapTile` is a data class that contains the `Tile` but also its position and layer.
+
+Combine `Intersectioner` and `CollisionDecisionMaker` to tell a `Positioner`
+when the movement should stop.
+```java
+LevelMapIntersectioner i = //(...)
+RpgMakerCharPositioner p = //(...)
+p.getCollisionDecisionMakers().add((sprite, area) -> {
+    List<LevelMapTile> tiles = i.intersectsTiles(area);
+    for(LevelMapTile lmt : tiles) {
+        if("collision".equals(lmt.getTile().getType())) {
+            return true;
+        }
+    }
+    return false;
+});
+```
 
 ### Map
 
@@ -200,6 +225,7 @@ base class in JASGL `LevelMap`.
 * *`LevelMap`* is the base class of all maps and just states that is can be rendered layer-wise. If you want to create your own map,
 you can inherit from this class.
   * `TiledOrthogonalLevelMap` represents an orthogonal map created by [Tiled](https://www.mapeditor.org/) map editor.
+    * `CustomTiledOrthogonalLevelMap` additionally allows to render tiles individually and parameterized.
 
 ```java
 public MyGame() {

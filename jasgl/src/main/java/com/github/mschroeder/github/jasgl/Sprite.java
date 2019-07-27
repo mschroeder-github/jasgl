@@ -2,13 +2,15 @@ package com.github.mschroeder.github.jasgl;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 
 /**
  * A sprite is a moveable object in the game.
  * @author Markus Schr&ouml;der
  */
-public abstract class Sprite {
+public abstract class Sprite implements Areaable {
     
     /**
      * Position of the sprite.
@@ -39,5 +41,15 @@ public abstract class Sprite {
     public int getY() {
         return (int) Math.round(pos.y);
     }
+
+    /**
+     * The position point as small rectangle.
+     * @return 
+     */
+    @Override
+    public Area getArea() {
+        return new Area(new Rectangle.Double(pos.x, pos.y, 0.0001, 0.0001));
+    }
+    
     
 }

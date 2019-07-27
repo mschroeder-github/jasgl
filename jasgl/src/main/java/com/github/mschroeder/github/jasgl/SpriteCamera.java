@@ -1,6 +1,8 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.geom.Area;
 
 /**
  * A camera that follows a sprite.
@@ -28,8 +30,11 @@ public class SpriteCamera extends Camera {
         
         Dimension screen = gameLoop.getScreenSize();
         
-        offset.x = sprite.pos.x - (screen.width / 2.0);
-        offset.y = sprite.pos.y - (screen.height / 2.0);
+        Area a = sprite.getArea();
+        Rectangle bounds = a.getBounds();
+        
+        offset.x = sprite.pos.x - (screen.width / 2.0) + (bounds.getWidth()/2.0);
+        offset.y = sprite.pos.y - (screen.height / 2.0) + (bounds.getHeight()/2.0);
     }
     
 }

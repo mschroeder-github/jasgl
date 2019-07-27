@@ -7,6 +7,7 @@ import java.util.List;
 import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.ObjectGroup;
+import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 import org.mapeditor.view.OrthogonalRenderer;
 
@@ -128,6 +129,22 @@ public class TiledOrthogonalLevelMap extends LevelMap {
         return null;
     }
 
+    /**
+     * Get tiles from all layers at position x,y.
+     * @param x
+     * @param y
+     * @return 
+     */
+    public List<Tile> getTiles(int x, int y) {
+        List<Tile> result = new ArrayList<>();
+        for(TileLayer layer : getTileLayers()) {
+            if(layer.contains(x, y)) {
+                result.add(layer.getTileAt(x, y));
+            }
+        }
+        return result;
+    }
+    
     /*package*/ OrthogonalRenderer getOrthogonalRenderer() {
         return orthogonalRenderer;
     }

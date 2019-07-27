@@ -19,6 +19,8 @@ import org.mapeditor.view.OrthogonalRenderer;
  */
 public class TiledOrthogonalLevelMap extends LevelMap {
 
+    private boolean DEBUG = true;
+    
     private CustomTMXMapReader reader;
     private org.mapeditor.core.Map map;
     private OrthogonalRenderer orthogonalRenderer;
@@ -38,7 +40,8 @@ public class TiledOrthogonalLevelMap extends LevelMap {
         }
         long end = System.currentTimeMillis();
         
-        //System.out.println("load map " + tmxFile.getName() + " in " + (end - start) + " ms");
+        if(DEBUG)
+            System.out.println("load map " + tmxFile.getName() + " in " + (end - start) + " ms");
     }
     
     /**
@@ -56,7 +59,8 @@ public class TiledOrthogonalLevelMap extends LevelMap {
         }
         long end = System.currentTimeMillis();
         
-        //System.out.println("load map " + tmxFile.getName() + " in " + (end - start) + " ms");
+        if(DEBUG)
+            System.out.println("load map " + resourcePath + " in " + (end - start) + " ms");
     }
     
     /**

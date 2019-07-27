@@ -9,8 +9,9 @@ import org.mapeditor.core.ObjectGroup;
  * event handling.
  * @author Markus Schr&ouml;der
  */
-public abstract class TiledGame implements Game {
+public abstract class TiledGame implements Game, GameState {
 
+    protected GameMultiplexer gameMultiplexer;
     protected GameLoop gameLoop;
     
     //the positioner that moves the player's sprite
@@ -22,6 +23,8 @@ public abstract class TiledGame implements Game {
     protected TiledOrthogonalLevelMap map;
     //other sprites (NPCs, doors, etc.)
     protected ListOfSprites sprites;
+    
+    protected Sprite playerSprite;
 
     public TiledGame(InputBasedPositioner playerSpritePositioner, SpriteCamera playerSpriteCamera, TiledOrthogonalLevelMap map) {
         this.playerSpritePositioner = playerSpritePositioner;
@@ -40,15 +43,60 @@ public abstract class TiledGame implements Game {
     
     /**
      * The sprite the player controls in this game.
-     * @param sprite 
+     * @param sprite null if you want to reset the player sprite
      */
     public void setPlayerSprite(Sprite sprite) {
-        playerSpritePositioner.sprites.clear();
-        playerSpritePositioner.sprites.add(sprite);
         
-        playerSpriteCamera.setSprite(sprite);
+        //reset
+        if(sprite == null) {
+            if(this.playerSprite != null) {
+                
+                playerSpritePositioner.sprites.clear();
+                playerSpriteCamera.setSprite(null);
+                sprites.remove(this.playerSprite);
+                
+                this.playerSprite = null;
+            }
+        } else {
+            this.playerSprite = sprite;
+
+            playerSpritePositioner.sprites.clear();
+            playerSpritePositioner.sprites.add(sprite);
+
+            playerSpriteCamera.setSprite(sprite);
+
+            sprites.addIfAbsent(sprite);
+        }
+    }
+    
+    /**
+     * Teleports the player to another game and switchs to the game.
+     * @param gameName name of the game registered in gameMultiplexer
+     * @param x the player's new x position
+     * @param y the player's new y position
+     */
+    public void teleportPlayer(String gameName, double x, double y) {
+        if(this.playerSprite == null)
+            throw new RuntimeException("playerSprite is null");
         
-        sprites.addIfAbsent(sprite);
+        //the teleported sprite
+        Sprite teleportedSprite = this.playerSprite;
+        //new position in the other game
+        teleportedSprite.pos.x = x;
+        teleportedSprite.pos.y = y;
+        
+        //reset the player sprite in this game
+        this.setPlayerSprite(null);
+        
+        TiledGame targetGame = (TiledGame) gameMultiplexer.getGame(gameName);
+        if(targetGame == null)
+            throw new RuntimeException(gameName + " not found for teleport");
+        
+        //give target game the player
+        targetGame.setPlayerSprite(teleportedSprite);
+        
+        //switch to game
+        gameMultiplexer.switchTo(gameName);
     }
     
     /**
@@ -80,6 +128,19 @@ public abstract class TiledGame implements Game {
 
     public ListOfSprites getSprites() {
         return sprites;
+    }
+
+    @Override
+    public void init(GameMultiplexer gameMultiplexer) {
+        this.gameMultiplexer = gameMultiplexer;
+    }
+
+    @Override
+    public void enter(String predecessorName, Game predecessor) {
+    }
+
+    @Override
+    public void leave(String successorName, Game successor) {
     }
     
 }

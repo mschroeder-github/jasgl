@@ -18,13 +18,8 @@ import java.util.Map.Entry;
  */
 public class RpgMakerCharPositioner extends InputBasedPositioner {
     
-    /**
-     * The positioner can check if the sprites that will be moved will intersect
-     * something. If this is the case, the positioner is not allowed to move them.
-     */
-    //protected SpritesTiledMapIntersectioner intersectioner;
-    
     private List<CollisionDecisionMaker> collisionDecisionMakers;
+    private List<SpriteListener> spriteListeners;
     
     private LinkedList<Integer> keyCodes = new LinkedList<>();
 
@@ -51,6 +46,7 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         double durationMillis = stepDistance / pixelPerMilliSpeed;
         
         collisionDecisionMakers = new ArrayList<>();
+        spriteListeners = new ArrayList<>();
     }
 
     /**
@@ -118,7 +114,14 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
 
         //when the distance is moved
         if (prop >= 1.0) {
-           
+            
+            //invoke pos changed
+            for(Sprite sprite : sprites.toArray(new Sprite[0])) {
+                for(SpriteListener l : spriteListeners) {
+                    l.spriteChanged(sprite);
+                }
+            }
+            
             //if still key down prepare again for moving
             if (!keyCodes.isEmpty()) {
                 prepare();
@@ -207,4 +210,8 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         return collisionDecisionMakers;
     }
 
+    public List<SpriteListener> getSpriteListeners() {
+        return spriteListeners;
+    }
+    
 }

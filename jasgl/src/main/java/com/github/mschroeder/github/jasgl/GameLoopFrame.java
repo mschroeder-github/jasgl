@@ -2,10 +2,10 @@ package com.github.mschroeder.github.jasgl;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -41,7 +41,9 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     private boolean running = true;
     
     private Object inputLock = new Object();
-
+    
+    private Dimension fixedViewportSize;
+    
     public GameLoopFrame(String title, int w, int h, Color background, Game game) {
         initComponents();
 
@@ -330,9 +332,60 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     
     //uses double buffer
     private void activeRendering() {
-        Graphics g = canvas.getBufferStrategy().getDrawGraphics();
+        //see also https://stackoverflow.com/a/200493
+        
+        Graphics2D g = (Graphics2D) canvas.getBufferStrategy().getDrawGraphics();
         if (g != null) {
-            render((Graphics2D) g);
+            
+            if(fixedViewportSize != null) {
+                //render to fixed sized image
+                BufferedImage img = g.getDeviceConfiguration().createCompatibleImage(
+                        fixedViewportSize.width,
+                        fixedViewportSize.height
+                );
+                
+                //render on the image
+                Graphics2D ig = img.createGraphics();
+                ig.setClip(0, 0, img.getWidth(), img.getHeight());
+                render(ig);
+                ig.dispose();
+        
+                //background
+                if(background != null) {
+                    g.setColor(background);
+                    g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                }
+                
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                //g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                //g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                
+                double canvasRatio = canvas.getWidth() / (double) canvas.getHeight();
+                double imgRatio = img.getWidth() / (double) img.getHeight();
+                
+                if(canvasRatio >= imgRatio) {
+                    double ratio = (double) canvas.getHeight() / img.getHeight();
+                    int streched = (int) (img.getWidth() * ratio);
+                    int x = (int) Math.round((canvas.getWidth() - streched) / 2.0);
+                    
+                    //fill height
+                    g.drawImage(img, x, 0, streched, canvas.getHeight(), null);
+                } else {
+                    //fill width
+                    double ratio = (double) canvas.getWidth()/ img.getWidth();
+                    int streched = (int) (img.getHeight() * ratio);
+                    int y = (int) Math.round((canvas.getHeight() - streched) / 2.0);
+                    
+                    //fill height
+                    g.drawImage(img, 0, y, canvas.getWidth(), streched, null);
+                }
+                
+            } else {
+                //render direct to canvas
+                g.setClip(0, 0, canvas.getWidth(), canvas.getHeight());
+                render(g);
+            }
+            
             g.dispose();
             canvas.getBufferStrategy().show();
             Toolkit.getDefaultToolkit().sync();
@@ -341,8 +394,6 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
 
     //render with canvas and double buffer
     private void render(Graphics2D g) {
-        g.setClip(0, 0, canvas.getWidth(), canvas.getHeight());
-        
         //background
         if(background != null) {
             g.setColor(background);
@@ -391,13 +442,24 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
     
     @Override
     public Dimension getScreenSize() {
+        if(fixedViewportSize != null) {
+            return fixedViewportSize;
+        }
         return canvas.getSize();
     }
     
-    //run a game in the loop
-    public static void loop(String title, int w, int h, Color background, Game game) {
+    public static void loop(String title, int frameWidth, int frameHeight, int viewportWidth, int viewportHeight, Color background, Game game) {
         java.awt.EventQueue.invokeLater(() -> {
-            new GameLoopFrame(title, w, h, background, game).setVisible(true);
+            GameLoopFrame f = new GameLoopFrame(title, frameWidth, frameHeight, background, game);
+            f.fixedViewportSize = new Dimension(viewportWidth, viewportHeight);
+            f.setVisible(true);
+        });
+    }
+    
+    //run a game in the loop
+    public static void loop(String title, int frameWidth, int frameHeight, Color background, Game game) {
+        java.awt.EventQueue.invokeLater(() -> {
+            new GameLoopFrame(title, frameWidth, frameHeight, background, game).setVisible(true);
         });
     }
 

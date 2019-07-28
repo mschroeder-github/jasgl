@@ -184,6 +184,15 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
         return true;
     }
     
+    /**
+     * Resets key press memory of this positioner.
+     */
+    @Override
+    public void reset() {
+        keyCodes.clear();
+        moving = false;
+    }
+    
     private class Movement {
         Point.Double start;
         Point.Double end;

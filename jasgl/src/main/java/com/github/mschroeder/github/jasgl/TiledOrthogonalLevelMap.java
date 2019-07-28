@@ -1,5 +1,6 @@
 package com.github.mschroeder.github.jasgl;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.util.ArrayList;
@@ -189,6 +190,14 @@ public class TiledOrthogonalLevelMap extends LevelMap {
                 orthogonalRenderer.paintTileLayer(g, tl);
             }
         }
+    }
+
+    @Override
+    public Dimension getDimension() {
+        return new Dimension(
+                map.getTileWidth()  * map.getWidth(), 
+                map.getTileHeight() * map.getHeight()
+        );
     }
     
 }

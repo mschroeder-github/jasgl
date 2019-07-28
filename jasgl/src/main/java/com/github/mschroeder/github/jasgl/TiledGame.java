@@ -52,6 +52,7 @@ public abstract class TiledGame implements Game, GameState {
             if(this.playerSprite != null) {
                 
                 playerSpritePositioner.sprites.clear();
+                playerSpritePositioner.reset();
                 playerSpriteCamera.setSprite(null);
                 sprites.remove(this.playerSprite);
                 
@@ -94,6 +95,15 @@ public abstract class TiledGame implements Game, GameState {
         
         //give target game the player
         targetGame.setPlayerSprite(teleportedSprite);
+        
+        //stop the animation if it is animated
+        if(teleportedSprite instanceof SpriteSheetSprite) {
+            SpriteSheetSprite sss = (SpriteSheetSprite) teleportedSprite;
+            sss.stop();
+        }
+        
+        //update camera
+        targetGame.playerSpriteCamera.update(0);
         
         //switch to game
         gameMultiplexer.switchTo(gameName);

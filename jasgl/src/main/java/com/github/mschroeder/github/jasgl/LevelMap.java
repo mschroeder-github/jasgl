@@ -1,5 +1,6 @@
 package com.github.mschroeder.github.jasgl;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 
 /**
@@ -16,5 +17,11 @@ public abstract class LevelMap {
      * @param g 
      */
     public abstract void render(String layerName, Graphics2D g);
+    
+    /**
+     * Returns the maximum dimension in pixel.
+     * @return 
+     */
+    public abstract Dimension getDimension();
     
 }

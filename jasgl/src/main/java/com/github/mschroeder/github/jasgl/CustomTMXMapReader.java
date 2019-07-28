@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
@@ -88,6 +89,8 @@ import org.xml.sax.SAXException;
  */
 public class CustomTMXMapReader {
 
+    private boolean DEBUG = false;
+    
     public long FLIPPED_HORIZONTALLY_FLAG = 0xFFFFFFFF80000000L;
     public long FLIPPED_VERTICALLY_FLAG = 0xFFFFFFFF40000000L;
     public long FLIPPED_DIAGONALLY_FLAG = 0xFFFFFFFF20000000L;
@@ -160,11 +163,35 @@ public class CustomTMXMapReader {
         }
     }
 
+    private static java.util.Map<Class, Unmarshaller> class2unmarshaller;
+    static {
+        class2unmarshaller = new HashMap<>();
+        try {
+            for(Class c : Arrays.asList(Tile.class, TileSet.class, ObjectGroup.class, Map.class)) {
+                class2unmarshaller.put(c, JAXBContext.newInstance(c).createUnmarshaller());
+            }
+        } catch (JAXBException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     private <T> T unmarshalClass(Node node, Class<T> type) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(type);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
+        long begin = System.currentTimeMillis();
+        
+        Unmarshaller unmarshaller;
+        if(class2unmarshaller.containsKey(type)) {
+            unmarshaller = class2unmarshaller.get(type);
+        } else {
+            unmarshaller = JAXBContext.newInstance(type).createUnmarshaller();
+        }
 
         JAXBElement<T> element = unmarshaller.unmarshal(node, type);
+        
+        long end = System.currentTimeMillis();
+        
+        if(DEBUG)
+            System.out.println(end - begin + " ms unmarshalClass " + type.getName());
+        
         return element.getValue();
     }
 
@@ -244,10 +271,18 @@ public class CustomTMXMapReader {
     }
 
     private TileSet unmarshalTileset(Node t) throws Exception {
+        long begin = System.currentTimeMillis();
+        
         TileSet set = unmarshalClass(t, TileSet.class);
 
+        if(DEBUG)
+            System.out.println("unmarshal tileset " + set.getName());
+        
         String source = set.getSource();
         if (source != null) {
+            if(DEBUG)
+                System.out.println("from source");
+            
             String filename = xmlPath + source;
             InputStream in;
             
@@ -269,6 +304,9 @@ public class CustomTMXMapReader {
                 return ext;
             }
         } else {
+            if(DEBUG)
+                System.out.println("from raw");
+            
             final int tileWidth = getAttribute(t, "tilewidth", map != null ? map.getTileWidth() : 0);
             final int tileHeight = getAttribute(t, "tileheight", map != null ? map.getTileHeight() : 0);
             final int tileSpacing = getAttribute(t, "spacing", 0);
@@ -367,6 +405,10 @@ public class CustomTMXMapReader {
                 }
             }
 
+            long end = System.currentTimeMillis();
+            if(DEBUG)
+                System.out.println(end - begin + " ms unmarshal tileset " + set.getName());
+            
             return set;
         }
     }
@@ -534,6 +576,8 @@ public class CustomTMXMapReader {
     }
 
     private ObjectGroup unmarshalObjectGroup(Node t) throws Exception {
+        long begin = System.currentTimeMillis();
+        
         ObjectGroup og = null;
         try {
             og = unmarshalClass(t, ObjectGroup.class);
@@ -558,6 +602,10 @@ public class CustomTMXMapReader {
             }
         }
 
+        long end = System.currentTimeMillis();
+        if(DEBUG)
+            System.out.println(end - begin + " ms object group");
+        
         return og;
     }
 
@@ -569,6 +617,8 @@ public class CustomTMXMapReader {
      * @throws Exception
      */
     private TileLayer readLayer(Node t) throws Exception {
+        long begin = System.currentTimeMillis();
+        
         final int layerWidth = getAttribute(t, "width", map.getWidth());
         final int layerHeight = getAttribute(t, "height", map.getHeight());
 
@@ -709,6 +759,10 @@ public class CustomTMXMapReader {
         // todo: something to keep in mind at this level?
         ml.setVisible(visible == 1);
 
+        long end = System.currentTimeMillis();
+        if(DEBUG) 
+            System.out.println(end - begin + " ms tile layer");
+        
         return ml;
     }
 
@@ -789,6 +843,7 @@ public class CustomTMXMapReader {
     }
 
     private Map unmarshal(InputStream in) throws Exception {
+        long begin = System.currentTimeMillis();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document doc;
         try {
@@ -808,6 +863,10 @@ public class CustomTMXMapReader {
                     + e.toString());
         }
 
+        long end = System.currentTimeMillis();
+        if(DEBUG)
+            System.out.println(end - begin + " ms parsing");
+        
         buildMap(doc);
 
         return map;

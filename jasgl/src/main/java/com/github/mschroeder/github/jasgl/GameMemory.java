@@ -42,7 +42,6 @@ public abstract class GameMemory {
      */
     public void save() {
         String now = LocalDateTime.now().format(dtf);
-        now = now.replaceAll("\\-", "").replaceAll("\\:", "");
         String filename = now + ".sav";
         
         String json = gson.toJson(this);

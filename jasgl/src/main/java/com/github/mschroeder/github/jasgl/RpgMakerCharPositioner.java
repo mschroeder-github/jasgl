@@ -222,5 +222,9 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
     public List<SpriteListener> getSpriteListeners() {
         return spriteListeners;
     }
+
+    public boolean isMoving() {
+        return moving;
+    }
     
 }

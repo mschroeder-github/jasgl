@@ -16,6 +16,9 @@ public class GameMultiplexer implements Game {
 
     private GameLoop gameLoop;
     
+    //to hold the save game
+    private GameMemory memory;
+    
     //loaded games with names in order to refer to them
     private Map<String, Game> name2game;
     
@@ -44,6 +47,15 @@ public class GameMultiplexer implements Game {
     
     public Game getGame(String name) {
         return name2game.get(name);
+    }
+    
+    public String getName(Game game) {
+        for(Entry<String, Game> e : name2game.entrySet()) {
+            if(e.getValue().equals(game)) {
+                return e.getKey();
+            }
+        }
+        return null;
     }
     
     /**
@@ -125,4 +137,17 @@ public class GameMultiplexer implements Game {
     public Set<Entry<String, Game>> getNamedGames() {
         return name2game.entrySet();
     }
+
+    public GameMemory getMemory() {
+        return memory;
+    }
+
+    public void setMemory(GameMemory memory) {
+        this.memory = memory;
+    }
+    
+    public boolean hasMemory() {
+        return this.memory != null;
+    }
+    
 }

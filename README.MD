@@ -4,6 +4,28 @@
 
 Game Library purely written in Java by using AWT/Swing canvas rendering.
 No external native libraries are used.
+In contrast to similar projects, this library tries to keep it simple and stupid (KISS principle).
+
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Using JASGL](#using-jasgl)
+	- [Load Images](#load-images)
+	- [Sprite Sheet](#sprite-sheet)
+	- [Sprite](#sprite)
+		- [Interfaces](#interfaces)
+	- [Animator](#animator)
+	- [Positioner](#positioner)
+	- [Intersection & Collision](#intersection-collision)
+	- [Map](#map)
+		- [Tileset](#tileset)
+		- [Map with Layers](#map-with-layers)
+		- [Objects](#objects)
+		- [Maps in JASGL](#maps-in-jasgl)
+	- [Camera](#camera)
+	- [Game States](#game-states)
+	- [Game Memory](#game-memory)
+
+<!-- /TOC -->
 
 Start your game loop with a one liner (title, window size, background color).
 This hides the following complexity: game loop thread, double-buffered 30 FPS active rendering on canvas, swing keyboard and mouse input processing and
@@ -291,6 +313,8 @@ public void render(Graphics2D g) {
 }
 ```
 
+
+
 ### Game States
 
 ![Game States](img/states.png)
@@ -357,5 +381,36 @@ private class GameState1 implements GameState {
 
 private class GameState2 implements GameState {
     //(...)
+}
+```
+
+### Game Memory
+
+![Memory Card](img/memory.png)
+
+Model the memory to save the progess of the game for the player.
+```java
+public MyGameMemory extends GameMemory {
+    //attributes for player position or game progress
+}
+```
+
+The `GameMultiplexer` holds the memory for all the games.
+```java
+@Override
+public void init(GameMultiplexer gameMultiplexer) {
+    memory = (MyGameMemory) gameMultiplexer.getMemory();
+}
+```
+By default, the memory is saved in a (working directory) `save` folder with `yyyyMMddHHmmss` date time pattern filename.
+The `GameMemory.load()` method loads the last saved memory. If not available, it returns a new instance of it (your "new game" state).
+Save the game by set relevant information in memory and call `save()`.
+```java
+private void saveGame() {
+    //update memory (where you are now)
+    //memory.set(...)
+    //save it
+    memory.save();
+    System.out.println("memory saved");
 }
 ```

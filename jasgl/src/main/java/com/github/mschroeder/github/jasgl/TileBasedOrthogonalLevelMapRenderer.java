@@ -40,14 +40,16 @@ public class TileBasedOrthogonalLevelMapRenderer {
     
     public class DrawContext {
         private Point point;
+        private Point grid;
         private Tile tile;
         private TileLayer tileLayer;
         private Graphics2D graphics;
         private Image image;
         private java.util.Map<String, Object> params;
 
-        public DrawContext(Point point, Tile tile, TileLayer tileLayer, Graphics2D graphics, Image image, java.util.Map<String, Object> params) {
+        public DrawContext(Point point, Point grid, Tile tile, TileLayer tileLayer, Graphics2D graphics, Image image, java.util.Map<String, Object> params) {
             this.point = point;
+            this.grid = grid;
             this.tile = tile;
             this.tileLayer = tileLayer;
             this.graphics = graphics;
@@ -81,6 +83,10 @@ public class TileBasedOrthogonalLevelMapRenderer {
 
         public TileLayer getTileLayer() {
             return tileLayer;
+        }
+
+        public Point getGrid() {
+            return grid;
         }
         
     }
@@ -152,7 +158,7 @@ public class TileBasedOrthogonalLevelMapRenderer {
                     drawLoc.y += tile.getTileSet().getTileoffset() != null ? tile.getTileSet().getTileoffset().getY() : 0;
 
                     if(tileRenderer != null) {
-                        tileRenderer.accept(new DrawContext(drawLoc, tile, layer, g, image, params));
+                        tileRenderer.accept(new DrawContext(drawLoc, new Point(x, y), tile, layer, g, image, params));
                     } else {
                         g.drawImage(image, drawLoc.x, drawLoc.y, null);
                     }

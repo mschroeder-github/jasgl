@@ -233,6 +233,7 @@ One layer can use multiple tilesets.
 ![ISO-Vs-Ortho](img/iso-vs-ortho.png)
 
 Usually, one of the two perspectives are used to render a map: isometric or orthogonal.
+Currently, JASGL supports mostly orthogonal rendering.
 
 #### Map Objects
 
@@ -273,8 +274,9 @@ Map Renderer draw maps in various ways depending on the effect.
 
 * `LayerBasedOrthogonalLevelMapRenderer` allows to render separate layers with `render(String layerName, Graphics2D g)`.
 * `TileBasedOrthogonalLevelMapRenderer` allows to render each tile separately with a `Consumer<DrawContext> tileRenderer`.
+* `StackRowBasedOrthogonalLevelMapRenderer` renders tiles stacked and row based with map objects (having tiles) and sprites in between based on y-coordinate.
 
-An layer-based example:
+An simple layer-based example:
 ```java
 LayerBasedOrthogonalLevelMapRenderer r = new LayerBasedOrthogonalLevelMapRenderer(lvl01);
 

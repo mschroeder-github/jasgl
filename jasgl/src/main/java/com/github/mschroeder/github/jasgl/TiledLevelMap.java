@@ -15,20 +15,24 @@ import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
 
 /**
- * Represents an orthogonal map created by <a href="https://www.mapeditor.org/">Tiled</a> map editor.
- * Use the getter methods to access tile and object layer together with the map objects.
+ * Represents an orthogonal map created by
+ * <a href="https://www.mapeditor.org/">Tiled</a> map editor. Use the getter
+ * methods to access tile and object layer together with the map objects.
+ *
  * @author Markus Schr&ouml;der
  */
 public class TiledLevelMap extends LevelMap {
 
     private boolean DEBUG = true;
-    
+
     private CustomTMXMapReader reader;
     private org.mapeditor.core.Map map;
-    
+
     /**
      * Loads one map from file.
-     * @param tmxFile a file crated with the <a href="https://www.mapeditor.org/">Tiled</a> map editor.  
+     *
+     * @param tmxFile a file crated with the
+     * <a href="https://www.mapeditor.org/">Tiled</a> map editor.
      */
     public TiledLevelMap(File tmxFile) {
         long start = System.currentTimeMillis();
@@ -39,13 +43,15 @@ public class TiledLevelMap extends LevelMap {
             throw new RuntimeException(ex);
         }
         long end = System.currentTimeMillis();
-        
-        if(DEBUG)
+
+        if (DEBUG) {
             System.out.println("load map " + tmxFile.getName() + " in " + (end - start) + " ms");
+        }
     }
-    
+
     /**
      * Loads one map from resources.
+     *
      * @param resourcePath path to the tmx file in the resources.
      */
     public TiledLevelMap(String resourcePath) {
@@ -57,13 +63,15 @@ public class TiledLevelMap extends LevelMap {
             throw new RuntimeException(ex);
         }
         long end = System.currentTimeMillis();
-        
-        if(DEBUG)
+
+        if (DEBUG) {
             System.out.println("load map " + resourcePath + " in " + (end - start) + " ms");
+        }
     }
-    
+
     /**
      * Finds tile layer by name.
+     *
      * @param name
      * @return null if not found.
      */
@@ -75,9 +83,10 @@ public class TiledLevelMap extends LevelMap {
         }
         return null;
     }
-    
+
     /**
      * Lists all tile layers in the map.
+     *
      * @return It is sorted bottom-layer first.
      */
     public List<TileLayer> getTileLayers() {
@@ -89,10 +98,11 @@ public class TiledLevelMap extends LevelMap {
         }
         return result;
     }
-    
+
     /**
      * Lists all object groups in the map.
-     * @return 
+     *
+     * @return
      */
     public List<ObjectGroup> getObjectGroups() {
         List<ObjectGroup> result = new ArrayList<>();
@@ -106,6 +116,7 @@ public class TiledLevelMap extends LevelMap {
 
     /**
      * Finds an object group (layer) by name.
+     *
      * @param name
      * @return null if not found.
      */
@@ -120,12 +131,13 @@ public class TiledLevelMap extends LevelMap {
 
     /**
      * Finds a map object by name in a given object group (layer).
+     *
      * @param og
      * @param name
      * @return null if not found.
      */
     public MapObject getMapObjectByName(ObjectGroup og, String name) {
-        for(MapObject mo : og.getObjects()) {
+        for (MapObject mo : og.getObjects()) {
             if (mo.getName().equals(name)) {
                 return mo;
             }
@@ -135,28 +147,30 @@ public class TiledLevelMap extends LevelMap {
 
     /**
      * Lists all map objects from all object groups (layers).
-     * @return 
+     *
+     * @return
      */
     public List<MapObject> getMapObjects() {
         List<MapObject> l = new ArrayList<>();
-        for(ObjectGroup og : getObjectGroups()) {
+        for (ObjectGroup og : getObjectGroups()) {
             Iterator<MapObject> iter = og.iterator();
-            while(iter.hasNext()) {
+            while (iter.hasNext()) {
                 l.add(iter.next());
             }
         }
         return l;
     }
-    
+
     /**
-     * Lists all map objects with their grid coordinate.
-     * If a map object is larger than a grid tile it will be multiple times
-     * in the list for each grid coordinate.
+     * Lists all map objects with their grid coordinate. If a map object is
+     * larger than a grid tile it will be multiple times in the list for each
+     * grid coordinate.
+     *
      * @return e.g. (mo1, (0,0)), (mo1, (0,1)), (mo2, (42,13))
      */
     public List<Entry<MapObject, Point>> getMapObjectsWithGridCoord() {
         List<Entry<MapObject, Point>> l = new ArrayList<>();
-        
+
         for (MapObject mo : getMapObjects()) {
 
             int moxStart = (int) (mo.getX() / map.getTileWidth());
@@ -178,17 +192,18 @@ public class TiledLevelMap extends LevelMap {
         }
         return l;
     }
-    
+
     /**
      * Get tiles from all layers at position x,y.
+     *
      * @param x
      * @param y
-     * @return 
+     * @return
      */
     public List<Tile> getTiles(int x, int y) {
         List<Tile> result = new ArrayList<>();
-        for(TileLayer layer : getTileLayers()) {
-            if(layer.contains(x, y)) {
+        for (TileLayer layer : getTileLayers()) {
+            if (layer.contains(x, y)) {
                 result.add(layer.getTileAt(x, y));
             }
         }
@@ -196,8 +211,44 @@ public class TiledLevelMap extends LevelMap {
     }
 
     /**
+     * Creates a per row per column list while on a field a stack of Tile or MapObject is formed (bottom-first).
+     * @return list of (1) [y] rows of (2) [x] stack of (3) [z] Tile or MapObject.
+     */
+    public List<List<List<Object>>> getListOfRowsOfStack() {
+        List<List<List<Object>>> listOfRowsOfStack = new ArrayList<>();
+
+        for(int y = 0; y < map.getHeight(); y++) {
+            
+            List<List<Object>> rowOfStack = new ArrayList<>();
+            for(int x = 0; x < map.getWidth(); x++) {
+                
+                //stack for (x,y)
+                List<Object> stack = new ArrayList<>();
+                for(MapLayer layer : map.getLayers()) {
+                    Object obj = null;
+                    if(layer instanceof TileLayer) {
+                        obj = ((TileLayer) layer).getTileAt(x, y);
+                    } else if(layer instanceof ObjectGroup) {
+                        obj = ((ObjectGroup) layer).getObjectAt(x * map.getTileWidth(), y * map.getTileHeight());
+                    }
+                    
+                    if(obj != null)
+                        stack.add(obj);
+                }
+                
+                rowOfStack.add(stack);
+            }
+            
+            listOfRowsOfStack.add(rowOfStack);
+        }
+        
+        return listOfRowsOfStack;
+    }
+
+    /**
      * The original map.
-     * @return 
+     *
+     * @return
      */
     public org.mapeditor.core.Map getTiledMap() {
         return map;
@@ -206,9 +257,9 @@ public class TiledLevelMap extends LevelMap {
     @Override
     public Dimension getDimension() {
         return new Dimension(
-                map.getTileWidth()  * map.getWidth(), 
+                map.getTileWidth() * map.getWidth(),
                 map.getTileHeight() * map.getHeight()
         );
     }
-    
+
 }

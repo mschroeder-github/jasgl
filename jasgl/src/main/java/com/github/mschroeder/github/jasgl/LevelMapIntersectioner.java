@@ -15,9 +15,9 @@ import org.mapeditor.core.TileLayer;
  */
 public class LevelMapIntersectioner extends Intersectioner {
     
-    protected TiledOrthogonalLevelMap map;
+    protected TiledLevelMap map;
 
-    public LevelMapIntersectioner(TiledOrthogonalLevelMap map) {
+    public LevelMapIntersectioner(TiledLevelMap map) {
         this.map = map;
     }
     

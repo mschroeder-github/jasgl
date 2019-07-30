@@ -8,7 +8,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
-import java.io.File;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import org.mapeditor.core.Map;
@@ -19,10 +18,11 @@ import org.mapeditor.core.TileLayer;
 import org.mapeditor.view.MapRenderer;
 
 /**
- *
+ * With a custom tile consumer you can render each tile individually.
+ * There is also the possibility to pass parameters.
  * @author Markus Schr&ouml;der
  */
-public class CustomTiledOrthogonalLevelMap extends TiledOrthogonalLevelMap {
+public class TileBasedOrthogonalLevelMapRenderer {
 
     private OrthogonalRenderer orthogonalRenderer;
     /**
@@ -31,18 +31,11 @@ public class CustomTiledOrthogonalLevelMap extends TiledOrthogonalLevelMap {
      */
     private Consumer<DrawContext> tileRenderer;
     
-    public CustomTiledOrthogonalLevelMap(File tmxFile) {
-        super(tmxFile);
-        init();
-    }
+    private TiledLevelMap map;
 
-    public CustomTiledOrthogonalLevelMap(String resourcePath) {
-        super(resourcePath);
-        init();
-    }
-
-    private void init() {
-        orthogonalRenderer = new OrthogonalRenderer(getTiledMap());
+    public TileBasedOrthogonalLevelMapRenderer(TiledLevelMap map) {
+        this.map = map;
+        this.orthogonalRenderer = new OrthogonalRenderer(map.getTiledMap());
     }
     
     public class DrawContext {
@@ -236,18 +229,17 @@ public class CustomTiledOrthogonalLevelMap extends TiledOrthogonalLevelMap {
         }
     }
 
-    @Override
     public void render(String layerName, Graphics2D g) {
         render(layerName, g, new HashMap<>());
     }
     
     public void render(String layerName, Graphics2D g, java.util.Map<String, Object> params) {
         if(layerName == null) {
-            for(TileLayer tl : getTileLayers()) {
+            for(TileLayer tl : map.getTileLayers()) {
                 orthogonalRenderer.paintTileLayer(g, tl, params);
             }
         } else {
-            TileLayer tl = getTileLayerByName(layerName);
+            TileLayer tl = map.getTileLayerByName(layerName);
             if(tl != null) {
                 orthogonalRenderer.paintTileLayer(g, tl, params);
             }

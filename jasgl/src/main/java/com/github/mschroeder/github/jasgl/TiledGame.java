@@ -20,13 +20,13 @@ public abstract class TiledGame implements Game, GameState {
     protected SpriteCamera playerSpriteCamera;
     
     //the map in which the player's sprite moves
-    protected TiledOrthogonalLevelMap map;
+    protected TiledLevelMap map;
     //other sprites (NPCs, doors, etc.)
     protected ListOfSprites sprites;
     
     protected Sprite playerSprite;
 
-    public TiledGame(InputBasedPositioner playerSpritePositioner, SpriteCamera playerSpriteCamera, TiledOrthogonalLevelMap map) {
+    public TiledGame(InputBasedPositioner playerSpritePositioner, SpriteCamera playerSpriteCamera, TiledLevelMap map) {
         this.playerSpritePositioner = playerSpritePositioner;
         this.playerSpriteCamera = playerSpriteCamera;
         this.map = map;
@@ -151,6 +151,10 @@ public abstract class TiledGame implements Game, GameState {
 
     @Override
     public void leave(String successorName, Game successor) {
+    }
+
+    public TiledLevelMap getMap() {
+        return map;
     }
     
 }

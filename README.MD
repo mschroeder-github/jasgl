@@ -16,11 +16,12 @@ In contrast to similar projects, this library tries to keep it simple and stupid
 	- [Animator](#animator)
 	- [Positioner](#positioner)
 	- [Intersection & Collision](#intersection-collision)
-	- [Map](#map)
+	- [Tiled Map Basics](#tiled-map-basics)
 		- [Tileset](#tileset)
-		- [Map with Layers](#map-with-layers)
-		- [Objects](#objects)
-		- [Maps in JASGL](#maps-in-jasgl)
+		- [Layers](#layers)
+		- [Map Objects](#map-objects)
+	- [Level Map](#level-map)
+	- [Level Map Renderer](#level-map-renderer)
 	- [Camera](#camera)
 	- [Game States](#game-states)
 	- [Game Memory](#game-memory)
@@ -146,12 +147,12 @@ A `SpriteSheet` gives a sequence of subimages a name (e.g. "killed" are the imag
 ![Sprite](img/sprite.png)
 
 * *`Sprite`* is a moveable object in the game. Thus, it basically has a position. It is updatable and renderable.
-  * `DummySprite` renders just a black rectangle.
   * `SpriteSheetSprite` is a sprite that uses a `SpriteSheet` and an `Animator` to present its
     appearance using animated sequence of images.
     * `RpgMakerCharSprite` is a rpg marker character sprite. You have to state the character index because
     in one sprite 8 character are present. The animator is given with a configured `SequentialFixedIntervalFrameAnimator`.
-* `ListOfSprites` is a (array-)list of sprites with additional list based operations on sprites.
+
+Note: `ListOfSprites` is a useful (array-)list of sprites with additional list based operations on sprites.
 
 #### Interfaces
 
@@ -185,7 +186,7 @@ A positioner moves `Sprite`s in the game, maybe based on input.
 ![Intersection & Collision](img/colandintersec.png)
 
 * `Intersectioner` is used to calculate if something intersects another thing.
-  * `LevelMapIntersectioner` takes a `TiledOrthogonalLevelMap` and checks what tiles are intersectioned.
+  * `LevelMapIntersectioner` takes a `TiledLevelMap` and checks what tiles are intersectioned.
 * `CollisionDecisionMaker` is used to specify when a sprite collides with something.
 * `LevelMapTile` is a data class that contains the `Tile` but also its position and layer.
 
@@ -205,7 +206,7 @@ p.getCollisionDecisionMakers().add((sprite, area) -> {
 });
 ```
 
-### Map
+### Tiled Map Basics
 
 ![Map](img/map.png)
 
@@ -223,7 +224,7 @@ In [Tiled](https://www.mapeditor.org/) you can load tileset images and create a 
 The tileset is XML-based and stores a relative path to the image file.
 Individual tiles can have string, int, float, boolean, file and color typed key-value-based properties.
 
-#### Map with Layers
+#### Layers
 
 [Tiled](https://www.mapeditor.org/) allows you to create a map (file extension `*.tmx`) with multiple tile layers.
 This map format is also XML-based and stores relative paths to tilesets.
@@ -233,12 +234,14 @@ One layer can use multiple tilesets.
 
 Usually, one of the two perspectives are used to render a map: isometric or orthogonal.
 
-#### Objects
+#### Map Objects
 
 There are object layers that contain a set of objects instead of tiles.
 This can be used to define where sprites should be placed or events should be triggered.
 
-#### Maps in JASGL
+### Level Map
+
+![Map](img/map-grid.png)
 
 [Tiled](https://www.mapeditor.org/) has a library called [libtiled](https://mvnrepository.com/artifact/org.mapeditor/libtiled) to read and render maps in Java.
 JASGL uses this library and adds some utlity functions. In order to avoid name clashes with `Map` we call the
@@ -246,29 +249,43 @@ base class in JASGL `LevelMap`.
 
 * *`LevelMap`* is the base class of all maps and just states that is can be rendered layer-wise. If you want to create your own map,
 you can inherit from this class.
-  * `TiledOrthogonalLevelMap` represents an orthogonal map created by [Tiled](https://www.mapeditor.org/) map editor.
-    * `CustomTiledOrthogonalLevelMap` additionally allows to render tiles individually and parameterized.
+  * `TiledLevelMap` represents an orthogonal map created by [Tiled](https://www.mapeditor.org/) map editor.
 
 ```java
 public MyGame() {
-    TiledOrthogonalLevelMap lvl01 = new TiledOrthogonalLevelMap(new File("/path/to/lvl01.tmx"));
+    TiledLevelMap lvl01 = new TiledLevelMap(new File("/path/to/lvl01.tmx"));
     //or from maven's src/main/resources
-    //TiledOrthogonalLevelMap lvl01 = new TiledOrthogonalLevelMap("/resource/path/to/lvl01.tmx");
+    //TiledLevelMap lvl01 = new TiledLevelMap("/resource/path/to/lvl01.tmx");
 
     //access map data
     TileLayer foreground = lvl01.getTileLayerByName("foreground");
     ObjectGroup npcs = lvl01.getObjectGroupByName("NPCs");
     MapObject enemy01 = lvl01.getMapObjectByName(npcs, "enemy01");
 }
+```
+
+### Level Map Renderer
+
+![Renderer](img/renderer.png)
+
+A LevelMap is only a data class that holds what is in the map.
+Map Renderer draw maps in various ways depending on the effect.
+
+* `LayerBasedOrthogonalLevelMapRenderer` allows to render separate layers with `render(String layerName, Graphics2D g)`.
+* `TileBasedOrthogonalLevelMapRenderer` allows to render each tile separately with a `Consumer<DrawContext> tileRenderer`.
+
+An layer-based example:
+```java
+LayerBasedOrthogonalLevelMapRenderer r = new LayerBasedOrthogonalLevelMapRenderer(lvl01);
 
 @Override
 public void render(Graphics2D g) {
     //render all layers
-    lvl01.render(null, g);
+    r.render(null, g);
     //or render layer-wise
-    lvl01.render("background", g);
+    r.render("background", g);
     //here: render something in between the layers
-    lvl01.render("foreground", g);
+    r.render("foreground", g);
 }
 ```
 

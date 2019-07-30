@@ -25,7 +25,7 @@ public class LevelMapIntersectioner extends Intersectioner {
      * Checks if a given area intersects with map tiles.
      * Does not look at area width and height.
      * @param area
-     * @return 
+     * @return the list is sorted bottom-layer first.
      */
     public List<LevelMapTile> intersectsTiles(Area area) {
         List<LevelMapTile> tiles = new ArrayList<>();

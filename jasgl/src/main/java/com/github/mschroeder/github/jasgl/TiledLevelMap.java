@@ -78,7 +78,7 @@ public class TiledLevelMap extends LevelMap {
     
     /**
      * Lists all tile layers in the map.
-     * @return 
+     * @return It is sorted bottom-layer first.
      */
     public List<TileLayer> getTileLayers() {
         List<TileLayer> result = new ArrayList<>();

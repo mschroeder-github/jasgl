@@ -62,14 +62,14 @@ public class RpgMakerCharSprite extends SpriteSheetSprite implements Pivotable {
         g.drawRect(rect.x, rect.y, rect.width, rect.height);
         
         g.setColor(Color.blue);
-        g.drawRect(getX() - ((frame.width - 32)/2), getY() - (frame.height - 32) - 8, frame.width, frame.height);
+        g.drawRect(getX() - ((frame.width - 32)/2), getY() - (frame.height - 32), frame.width, frame.height);
         */
         
         GraphicsUtil.drawImage(g, sheet.getImage(),
                 frame,
                 new Rectangle(
                         getX() - ((frame.width - 32)/2), 
-                        getY() - (frame.height - 32) - 8,
+                        getY() - (frame.height - 32), //-8 or not?
                         frame.width, 
                         frame.height
                 )

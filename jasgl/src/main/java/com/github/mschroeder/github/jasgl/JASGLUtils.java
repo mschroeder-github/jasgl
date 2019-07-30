@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Markus Schr&ouml;der
  */
-public class Utils {
+public class JASGLUtils {
     
     /**
      * All arrow keys: left, right, up, down.
@@ -61,4 +61,13 @@ public class Utils {
         return Direction.values()[ARROWS.indexOf(keyCode)];
     }
     
+    /**
+     * Returns logically a implies b.
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static boolean implies(boolean a, boolean b) {
+        return !a || b;
+    }
 }

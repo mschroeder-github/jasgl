@@ -1,6 +1,6 @@
 package com.github.mschroeder.github.jasgl;
 
-import com.github.mschroeder.github.jasgl.Utils.Direction;
+import com.github.mschroeder.github.jasgl.JASGLUtils.Direction;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Area;

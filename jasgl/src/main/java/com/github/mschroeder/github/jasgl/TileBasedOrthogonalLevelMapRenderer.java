@@ -182,21 +182,34 @@ public class TileBasedOrthogonalLevelMapRenderer {
                     bounds.y * tsize.height);
 
             for (MapObject mo : group) {
+                if(mo.isVisible() != null && !mo.isVisible())
+                    continue;
+                
                 final double ox = mo.getX();
-                final double oy = mo.getY();
+                      double oy = mo.getY();
                 final Double objectWidth = mo.getWidth();
                 final Double objectHeight = mo.getHeight();
                 final double rotation = mo.getRotation();
                 final Tile tile = mo.getTile();
 
                 if (tile != null) {
+                    //fix
+                    oy = oy - objectHeight;
                     Image objectImage = tile.getImage();
                     AffineTransform old = g.getTransform();
                     g.rotate(Math.toRadians(rotation));
-                    g.drawImage(objectImage, (int) ox, (int) oy, null);
+                    g.drawImage(objectImage, 
+                            (int) ox, 
+                            (int) oy, 
+                            objectWidth.intValue(), 
+                            objectHeight.intValue(), 
+                            null
+                    );
                     g.setTransform(old);
                 } else if (objectWidth == null || objectWidth == 0
                         || objectHeight == null || objectHeight == 0) {
+                    //no dimension
+                    
                     g.setRenderingHint(
                             RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
@@ -208,6 +221,8 @@ public class TileBasedOrthogonalLevelMapRenderer {
                             RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_OFF);
                 } else {
+                    //with dimension
+                    
                     g.setColor(Color.black);
                     g.drawRect((int) ox + 1, (int) oy + 1,
                             mo.getWidth().intValue(),
@@ -217,6 +232,8 @@ public class TileBasedOrthogonalLevelMapRenderer {
                             mo.getWidth().intValue(),
                             mo.getHeight().intValue());
                 }
+                
+                //name
                 final String s = mo.getName() != null ? mo.getName() : "(null)";
                 g.setColor(Color.black);
                 g.drawString(s, (int) (ox - 5) + 1, (int) (oy - 5) + 1);
@@ -243,6 +260,9 @@ public class TileBasedOrthogonalLevelMapRenderer {
         if(layerName == null) {
             for(TileLayer tl : map.getTileLayers()) {
                 orthogonalRenderer.paintTileLayer(g, tl, params);
+            }
+            for(ObjectGroup og : map.getObjectGroups()) {
+                orthogonalRenderer.paintObjectGroup(g, og);
             }
         } else {
             TileLayer tl = map.getTileLayerByName(layerName);

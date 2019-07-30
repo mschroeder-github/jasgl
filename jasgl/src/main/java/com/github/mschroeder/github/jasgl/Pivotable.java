@@ -1,6 +1,6 @@
 package com.github.mschroeder.github.jasgl;
 
-import com.github.mschroeder.github.jasgl.Utils.Direction;
+import com.github.mschroeder.github.jasgl.JASGLUtils.Direction;
 
 /**
  * A sprite is pivotable when you can set a direction (left, up, right, down).

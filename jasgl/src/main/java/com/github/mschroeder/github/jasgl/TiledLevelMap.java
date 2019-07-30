@@ -1,10 +1,13 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.io.File;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import org.mapeditor.core.MapLayer;
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.ObjectGroup;
@@ -140,6 +143,37 @@ public class TiledLevelMap extends LevelMap {
             Iterator<MapObject> iter = og.iterator();
             while(iter.hasNext()) {
                 l.add(iter.next());
+            }
+        }
+        return l;
+    }
+    
+    /**
+     * Lists all map objects with their grid coordinate.
+     * If a map object is larger than a grid tile it will be multiple times
+     * in the list for each grid coordinate.
+     * @return e.g. (mo1, (0,0)), (mo1, (0,1)), (mo2, (42,13))
+     */
+    public List<Entry<MapObject, Point>> getMapObjectsWithGridCoord() {
+        List<Entry<MapObject, Point>> l = new ArrayList<>();
+        
+        for (MapObject mo : getMapObjects()) {
+
+            int moxStart = (int) (mo.getX() / map.getTileWidth());
+            int moyStart = (int) (mo.getY() / map.getTileHeight());
+
+            //fix y coord
+            if (mo.getTile() != null) {
+                moyStart = (int) ((mo.getY() - mo.getHeight()) / map.getTileHeight());
+            }
+
+            int w = (int) (mo.getWidth() / map.getTileWidth());
+            int h = (int) (mo.getHeight() / map.getTileHeight());
+
+            for (int moy = moyStart; moy < moyStart + h; moy++) {
+                for (int mox = moxStart; mox < moxStart + w; mox++) {
+                    l.add(new AbstractMap.SimpleEntry<>(mo, new Point(mox, moy)));
+                }
             }
         }
         return l;

@@ -1,6 +1,6 @@
 package com.github.mschroeder.github.jasgl;
 
-import com.github.mschroeder.github.jasgl.Utils.Direction;
+import com.github.mschroeder.github.jasgl.JASGLUtils.Direction;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -58,12 +58,12 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
     @Override
     public void input(Keyboard keyboard, Mouse mouse) {
         //check arrows
-        for (Integer keyCode : Utils.ARROWS) {
+        for (Integer keyCode : JASGLUtils.ARROWS) {
             if (keyboard.released(keyCode)) {
                 keyCodes.removeIf(kc -> kc == keyCode);
             }
         }
-        for (Integer keyCode : Utils.ARROWS) {
+        for (Integer keyCode : JASGLUtils.ARROWS) {
             if (keyboard.pressed(keyCode)) {
                 keyCodes.addFirst(keyCode);
             }
@@ -142,8 +142,8 @@ public class RpgMakerCharPositioner extends InputBasedPositioner {
     private void prepare() {
         movedDistance = 0;
         movingKeyCode = keyCodes.get(0);
-        direction = Utils.direction(movingKeyCode);
-        dirVec = Utils.directionVector(movingKeyCode);
+        direction = JASGLUtils.direction(movingKeyCode);
+        dirVec = JASGLUtils.directionVector(movingKeyCode);
         sprites.forEach(RpgMakerCharSprite.class, s -> {
             s.setDirection(direction);
             sprite2movement.put(s, new Movement(s.pos, dirVec));

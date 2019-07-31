@@ -228,12 +228,13 @@ public class TiledLevelMap extends LevelMap {
                     Object obj = null;
                     if(layer instanceof TileLayer) {
                         obj = ((TileLayer) layer).getTileAt(x, y);
-                    } else if(layer instanceof ObjectGroup) {
-                        obj = ((ObjectGroup) layer).getObjectAt(x * map.getTileWidth(), y * map.getTileHeight());
-                    }
-                    
-                    if(obj != null)
                         stack.add(obj);
+                    } else if(layer instanceof ObjectGroup) {
+                        for(MapObject mo : getObjectsAt(x, y, ((ObjectGroup) layer))) {
+                            //System.out.println(mo.getName() + " (" + x + "," + y + ")");
+                            stack.add(mo);
+                        }
+                    }
                 }
                 
                 rowOfStack.add(stack);
@@ -243,6 +244,28 @@ public class TiledLevelMap extends LevelMap {
         }
         
         return listOfRowsOfStack;
+    }
+    
+    public List<MapObject> getObjectsAt(int gridX, int gridY, ObjectGroup layer) {
+        List<MapObject> objects = new ArrayList<>();
+        double x = gridX * map.getTileWidth();
+        double y = gridY * map.getTileHeight();
+        for(MapObject mo : layer.getObjects()) {
+            double mox = mo.getX();
+            double moy;
+            if(mo.getTile() != null) {
+                //correct y coord
+                moy = mo.getY();
+            } else {
+                //have to add heigh
+                moy = mo.getY() + mo.getHeight();
+            }
+            
+            if(mox == x && moy == y) {
+                objects.add(mo);
+            }
+        }
+        return objects;
     }
 
     /**

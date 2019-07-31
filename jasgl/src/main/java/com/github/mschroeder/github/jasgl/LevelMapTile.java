@@ -41,7 +41,5 @@ public class LevelMapTile {
     public String toString() {
         return "LevelMapTile{" + "tile=" + tile + ", gridPosition=" + gridPosition + ", layer=" + layer.getName() + '}';
     }
-
- 
     
 }

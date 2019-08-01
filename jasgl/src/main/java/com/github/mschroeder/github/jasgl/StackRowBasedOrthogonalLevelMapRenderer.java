@@ -67,7 +67,7 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
                 //1:[][][]____#____ y
                 //2:[][][]
                 if(rectMaxY >= ((y * map.getTiledMap().getTileHeight() - (map.getTiledMap().getTileHeight()*0.99))) 
-                && rectMaxY <= (y * map.getTiledMap().getTileHeight())) {
+                && rectMaxY <= ((y+2) * map.getTiledMap().getTileHeight())) {
                     sprite.render(g);
                 }
             }

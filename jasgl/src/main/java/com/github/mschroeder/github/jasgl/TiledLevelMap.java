@@ -248,8 +248,6 @@ public class TiledLevelMap extends LevelMap {
     
     public List<MapObject> getObjectsAt(int gridX, int gridY, ObjectGroup layer) {
         List<MapObject> objects = new ArrayList<>();
-        double x = gridX * map.getTileWidth();
-        double y = gridY * map.getTileHeight();
         for(MapObject mo : layer.getObjects()) {
             double mox = mo.getX();
             double moy;
@@ -261,7 +259,10 @@ public class TiledLevelMap extends LevelMap {
                 moy = mo.getY() + mo.getHeight();
             }
             
-            if(mox == x && moy == y) {
+            int moGridX = (int)(mox / map.getTileWidth());
+            int moGridY = (int)(moy / map.getTileWidth());
+
+            if(moGridX == gridX && moGridY == gridY) {
                 objects.add(mo);
             }
         }

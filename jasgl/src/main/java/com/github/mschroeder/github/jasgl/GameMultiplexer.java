@@ -30,6 +30,7 @@ public class GameMultiplexer implements Game {
     
     public GameMultiplexer() {
         name2game = new HashMap<>();
+        scriptEngine = new GameScriptEngine(this);
     }
     
     public GameMultiplexer addGame(String name, Game game) {

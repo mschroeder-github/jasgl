@@ -111,6 +111,12 @@ public abstract class TiledGame implements Game, GameState {
         gameMultiplexer.switchTo(gameName);
     }
     
+    public void teleportPlayerToGrid(String mapName, int gx, int gy) {
+        double x = (double)gx * 32.0;
+        double y = (double)gy * 32.0;
+        teleportPlayer(mapName, x, y);
+    }
+    
     /**
      * In your implementation you decide how a map object is loaded as a sprite.
      * @param objectGroup the object layer

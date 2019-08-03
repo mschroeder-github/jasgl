@@ -43,6 +43,7 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
      * @param g
      */
     public void render(Graphics2D g) {
+        //TODO: problem: what about map objects being 2 tiles width and start at (-1,0): they have to be drawn also
         List<List<List<Object>>> listOfRowsOfStack = map.getListOfRowsOfStack();
         
         for(int y = 0; y < listOfRowsOfStack.size(); y++) {

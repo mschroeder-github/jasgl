@@ -151,6 +151,8 @@ A `SpriteSheet` gives a sequence of subimages a name (e.g. "killed" are the imag
     appearance using animated sequence of images.
     * `RpgMakerCharSprite` is a rpg marker character sprite. You have to state the character index because
     in one sprite 8 character are present. The animator is given with a configured `SequentialFixedIntervalFrameAnimator`.
+  * `TileSprite` instead of a complex `SpriteSheet` you can take one `Tile` from a `TiledLevelMap` as a sprite.
+    * `MultiTileSprite` the sprites holds multiple tiles and you can switch between them.
 
 Note: `ListOfSprites` is a useful (array-)list of sprites with additional list based operations on sprites.
 

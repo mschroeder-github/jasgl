@@ -16,26 +16,51 @@ public class GameMultiplexer implements Game {
 
     private GameLoop gameLoop;
     
-    //to hold the save game
-    private GameMemory memory;
-    
     //loaded games with names in order to refer to them
     private Map<String, Game> name2game;
     
     //the current game running
     private String currentGame;
-
-    //a script engine may allow scripting from within a Map, for instance
-    private GameScriptEngine scriptEngine;
     
     public GameMultiplexer() {
         name2game = new HashMap<>();
-        scriptEngine = new GameScriptEngine(this);
     }
+
+    //==========================================================================
+    
+    @Override
+    public void init(GameLoop gameLoop) {
+        this.gameLoop = gameLoop;
+        for(Game game : name2game.values()) {
+            game.init(gameLoop);
+        }
+    }
+
+    @Override
+    public void input(Keyboard keyboard, Mouse mouse) {
+        if(validGameName(currentGame)) {
+            name2game.get(currentGame).input(keyboard, mouse);
+        }
+    }
+
+    @Override
+    public void update(double ms) {
+        if(validGameName(currentGame)) {
+            name2game.get(currentGame).update(ms);
+        }
+    }
+
+    @Override
+    public void render(Graphics2D g) {
+        if(validGameName(currentGame)) {
+            name2game.get(currentGame).render(g);
+        }
+    }
+    
+    //==========================================================================
     
     public GameMultiplexer addGame(String name, Game game) {
         name2game.put(name, game);
-        game.setScriptEngine(scriptEngine);
         if(gameLoop != null) {
             game.init(gameLoop);
         }
@@ -110,35 +135,6 @@ public class GameMultiplexer implements Game {
         return this;
     }
     
-    @Override
-    public void init(GameLoop gameLoop) {
-        this.gameLoop = gameLoop;
-        for(Game game : name2game.values()) {
-            game.init(gameLoop);
-        }
-    }
-
-    @Override
-    public void input(Keyboard keyboard, Mouse mouse) {
-        if(validGameName(currentGame)) {
-            name2game.get(currentGame).input(keyboard, mouse);
-        }
-    }
-
-    @Override
-    public void update(double ms) {
-        if(validGameName(currentGame)) {
-            name2game.get(currentGame).update(ms);
-        }
-    }
-
-    @Override
-    public void render(Graphics2D g) {
-        if(validGameName(currentGame)) {
-            name2game.get(currentGame).render(g);
-        }
-    }
-    
     private boolean validGameName(String name) {
         return name != null && name2game.containsKey(name);
     }
@@ -149,22 +145,6 @@ public class GameMultiplexer implements Game {
     
     public Set<Entry<String, Game>> getNamedGames() {
         return name2game.entrySet();
-    }
-
-    public GameMemory getMemory() {
-        return memory;
-    }
-
-    public void setMemory(GameMemory memory) {
-        this.memory = memory;
-    }
-    
-    public boolean hasMemory() {
-        return this.memory != null;
-    }
-
-    public void setScriptEngine(GameScriptEngine scriptEngine) {
-        this.scriptEngine = scriptEngine;
     }
     
 }

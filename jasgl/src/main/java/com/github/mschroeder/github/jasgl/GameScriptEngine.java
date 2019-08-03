@@ -3,27 +3,25 @@ package com.github.mschroeder.github.jasgl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-
 import org.mapeditor.core.MapObject;
 
+/**
+ * A useful wrapper around Java's ScriptEngine to enable scripting in games.
+ * @author Markus Schr&ouml;der
+ */
 public class GameScriptEngine {
 
-    private GameMultiplexer gameMultiplexer;
+    //to use synchronized in eval() method
+    private Object evalLock = new Object();
     
-    private String jsEngineSync = "DummySyncObject";
     private ScriptEngine jsEngine;
     private Bindings jsBindings;
     private GameScriptConsole jsConsole;
-
-
-    public GameScriptEngine(GameMultiplexer gameMultiplexer) {
-        this.gameMultiplexer = gameMultiplexer;
-        this.gameMultiplexer.setScriptEngine(this);
-
+    
+    public GameScriptEngine() {
         jsConsole = new GameScriptConsole();
 
         // init javascript engine
@@ -32,21 +30,17 @@ public class GameScriptEngine {
         jsBindings = jsEngine.createBindings();
 
         jsBindings.put("console", jsConsole);
-        jsBindings.put("gameMultiplexer", gameMultiplexer);
         
+        //TODO maybe comment
         eval("console.log('scripting engine initialized.');", null);
     }
     
-    public GameMultiplexer getGameMultiplexer() {
-        return gameMultiplexer;
+    public void putBinding(String name, Object value) {
+        jsBindings.put(name, value);
     }
     
-    public Game getCurrentGame() {
-        return gameMultiplexer.getCurrentGame();
-    }
-    
-    public GameMemory getMemory() {
-         return gameMultiplexer.getMemory();
+    public void removeBinding(String name) {
+        jsBindings.remove(name);
     }
     
     public Object eval(String script, MapObject obj) {
@@ -56,10 +50,8 @@ public class GameScriptEngine {
     public Object eval(String script, MapObject obj, Map<String, Object> additionalBindings) {
         if (script == null || script.length() <= 0)
             return null;
-        synchronized(jsEngineSync) {
+        synchronized(evalLock) {
             try {
-                jsBindings.put("memory", gameMultiplexer.getMemory());
-                jsBindings.put("game", gameMultiplexer.getCurrentGame());
                 jsBindings.put("script", script);
                 jsBindings.put("object", obj);
                 if (additionalBindings != null) {
@@ -72,7 +64,7 @@ public class GameScriptEngine {
             } catch (Exception e) {
                 System.err.println("Exception while calling script on object " + obj);
                 e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
         }
     }

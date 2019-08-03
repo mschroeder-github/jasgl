@@ -165,9 +165,4 @@ public abstract class TiledGame implements Game, GameState {
         return map;
     }
     
-    @Override
-    public void setScriptEngine(GameScriptEngine scriptEngine) {
-        this.scriptEngine = scriptEngine;
-    }
-    
 }

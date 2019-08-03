@@ -25,6 +25,8 @@ public class TileSprite extends Sprite {
 
     @Override
     public void render(Graphics2D g) {
+        //g.setColor(Color.black);
+        //g.fillRect(0, 0, 1000, 1000);
         g.drawImage(tile.getImage(), (int) pos.x, (int) pos.y, size.width, size.height, null);
     }
 

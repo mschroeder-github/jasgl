@@ -1,8 +1,10 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import org.mapeditor.core.MapObject;
 import org.mapeditor.core.ObjectGroup;
 import org.mapeditor.core.Tile;
 import org.mapeditor.core.TileLayer;
+import org.mapeditor.core.TileSet;
 
 /**
  * Represents an orthogonal map created by
@@ -129,6 +132,20 @@ public class TiledLevelMap extends LevelMap {
         return null;
     }
 
+    /**
+     * Returns a tile set by name.
+     * @param name
+     * @return 
+     */
+    public TileSet getTileSetByName(String name) {
+        for (TileSet tileset : map.getTileSets()) {
+            if (tileset.getName().equals(name)) {
+                return tileset;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Finds a map object by name in a given object group (layer).
      *
@@ -292,6 +309,21 @@ public class TiledLevelMap extends LevelMap {
                 map.getTileWidth() * map.getWidth(),
                 map.getTileHeight() * map.getHeight()
         );
+    }
+    
+    /**
+     * Help method to access the image of a tile set.
+     * @param tileset
+     * @return 
+     */
+    public static Image getImage(TileSet tileset) {
+        try {
+            Field f = tileset.getClass().getDeclaredField("tileSetImage");
+            f.setAccessible(true);
+            return (Image) f.get(tileset);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

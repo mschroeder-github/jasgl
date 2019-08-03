@@ -1,7 +1,12 @@
 package com.github.mschroeder.github.jasgl;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
+import org.mapeditor.core.Animation;
+import org.mapeditor.core.Frame;
 import org.mapeditor.core.Tile;
+import org.mapeditor.core.TileSet;
 
 /**
  * A sprite that can be rendered with various tiles but only one tile at a time.
@@ -15,6 +20,16 @@ public class MultiTileSprite extends TileSprite {
     public MultiTileSprite(Dimension size, Tile... tiles) {
         super(size, tiles[0]);
         this.tiles = tiles;
+    }
+    
+    public MultiTileSprite(Dimension size, TileSet tileset, Animation animation) {
+        super(size, null);
+        List<Tile> tileArrayList = new ArrayList<>();
+        for(Frame frame : animation.getFrame()) {
+            tileArrayList.add(tileset.getTile(frame.getTileid()));
+        }
+        tiles = tileArrayList.toArray(new Tile[0]);
+        tile = tiles[0];
     }
 
     public int getTileIndex() {

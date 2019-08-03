@@ -33,4 +33,11 @@ public interface Game {
      */
     public void render(Graphics2D g);
     
+    /**
+     * Set a script engine.
+     * @param scriptEngine
+     */
+    public void setScriptEngine(GameScriptEngine scriptEngine);
+    
+
 }

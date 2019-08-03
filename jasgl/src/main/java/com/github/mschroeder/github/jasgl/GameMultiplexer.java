@@ -24,6 +24,9 @@ public class GameMultiplexer implements Game {
     
     //the current game running
     private String currentGame;
+
+    //a script engine may allow scripting from within a Map, for instance
+    private GameScriptEngine scriptEngine;
     
     public GameMultiplexer() {
         name2game = new HashMap<>();
@@ -31,6 +34,7 @@ public class GameMultiplexer implements Game {
     
     public GameMultiplexer addGame(String name, Game game) {
         name2game.put(name, game);
+        game.setScriptEngine(scriptEngine);
         if(gameLoop != null) {
             game.init(gameLoop);
         }
@@ -156,6 +160,10 @@ public class GameMultiplexer implements Game {
     
     public boolean hasMemory() {
         return this.memory != null;
+    }
+
+    public void setScriptEngine(GameScriptEngine scriptEngine) {
+        this.scriptEngine = scriptEngine;
     }
     
 }

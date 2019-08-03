@@ -26,6 +26,8 @@ public abstract class TiledGame implements Game, GameState {
     
     protected Sprite playerSprite;
 
+    protected GameScriptEngine scriptEngine;
+
     public TiledGame(InputBasedPositioner playerSpritePositioner, SpriteCamera playerSpriteCamera, TiledLevelMap map) {
         this.playerSpritePositioner = playerSpritePositioner;
         this.playerSpriteCamera = playerSpriteCamera;
@@ -155,6 +157,11 @@ public abstract class TiledGame implements Game, GameState {
 
     public TiledLevelMap getMap() {
         return map;
+    }
+    
+    @Override
+    public void setScriptEngine(GameScriptEngine scriptEngine) {
+        this.scriptEngine = scriptEngine;
     }
     
 }

@@ -246,6 +246,14 @@ public class TiledLevelMap extends LevelMap {
         return listOfRowsOfStack;
     }
     
+    /**
+     * Given a grid position returns all mapobjects that are on the field.
+     * The map object can be anywhere on a certain field and will still be selected.
+     * @param gridX
+     * @param gridY
+     * @param layer
+     * @return 
+     */
     public List<MapObject> getObjectsAt(int gridX, int gridY, ObjectGroup layer) {
         List<MapObject> objects = new ArrayList<>();
         for(MapObject mo : layer.getObjects()) {
@@ -260,7 +268,7 @@ public class TiledLevelMap extends LevelMap {
             }
             
             int moGridX = (int)(mox / map.getTileWidth());
-            int moGridY = (int)(moy / map.getTileWidth());
+            int moGridY = (int)(moy / map.getTileHeight());
 
             if(moGridX == gridX && moGridY == gridY) {
                 objects.add(mo);

@@ -5,7 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.mapeditor.core.MapObject;
@@ -46,7 +49,25 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
         //TODO: problem: what about map objects being 2 tiles width and start at (-1,0): they have to be drawn also
         List<List<List<Object>>> listOfRowsOfStack = map.getListOfRowsOfStack();
         
+        //project sprites to grid system to know when we have to draw them
+        Map<Integer, List<Sprite>> grid2sprite = new HashMap<>();
+        for(Sprite sprite : sprites) {
+            Rectangle rect = sprite.getArea().getBounds();
+            double rectMaxY = rect.getMaxY();
+            
+            //-------------------- 0
+            //0
+            //--------------------- 32  =0
+            //1   |      |              =1
+            //-----______---------- 64  =1
+            
+            int gridY = (int) Math.ceil(rectMaxY / map.getTiledMap().getTileHeight()) - 1;
+            grid2sprite.computeIfAbsent(gridY, i -> new ArrayList<>()).add(sprite);
+        }
+        
         for(int y = 0; y < listOfRowsOfStack.size(); y++) {
+            
+            //tile stacks in a row
             for(int x = 0; x < listOfRowsOfStack.get(y).size(); x++) {
                 //bottom-first
                 List<Object> stack = listOfRowsOfStack.get(y).get(x);
@@ -55,20 +76,9 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
                 }
             }
             
-            //draw all sprites standing in row y
-            //TODO could be improved: not all sprites are needed
-            for(Sprite sprite : sprites) {
-                Rectangle rect = sprite.getArea().getBounds();
-                double rectMaxY = rect.getMaxY();
-                
-                //double yMin = y * map.getTiledMap().getTileHeight() - map.getTiledMap().getTileHeight();
-                //double yMax = y * map.getTiledMap().getTileHeight();
-                
-                //0:[][][]----o---- y - 0.99
-                //1:[][][]____#____ y
-                //2:[][][]
-                if(rectMaxY >= ((y * map.getTiledMap().getTileHeight() - (map.getTiledMap().getTileHeight()*0.99))) 
-                && rectMaxY <= ((y+2) * map.getTiledMap().getTileHeight())) {
+            //sprites on top
+            if(grid2sprite.containsKey(y)) {
+                for(Sprite sprite : grid2sprite.get(y)) {
                     sprite.render(g);
                 }
             }

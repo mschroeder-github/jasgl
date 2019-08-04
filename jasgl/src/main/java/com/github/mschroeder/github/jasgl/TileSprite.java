@@ -2,6 +2,8 @@ package com.github.mschroeder.github.jasgl;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Area;
 import org.mapeditor.core.Tile;
 
 /**
@@ -37,5 +39,12 @@ public class TileSprite extends Sprite {
     public Dimension getSize() {
         return size;
     }
+
+    @Override
+    public Area getArea() {
+        return new Area(new Rectangle.Double(pos.x, pos.y, size.width, size.height));
+    }
+    
+    
     
 }

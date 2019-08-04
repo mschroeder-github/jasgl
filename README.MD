@@ -25,6 +25,8 @@ In contrast to similar projects, this library tries to keep it simple and stupid
 	- [Camera](#camera)
 	- [Game States](#game-states)
 	- [Game Memory](#game-memory)
+	- [Scripting](#scripting)
+	- [Game Overview](#game-overview)
 
 <!-- /TOC -->
 
@@ -425,7 +427,7 @@ public void init(GameMultiplexer gameMultiplexer) {
 ```
 By default, the memory is saved in a (working directory) `save` folder with `yyyyMMddHHmmss` date time pattern filename.
 The `GameMemory.load()` method loads the last saved memory. If not available, it returns a new instance of it (your "new game" state).
-Save the game by set relevant information in memory and call `save()`.
+Save the game by setting relevant information in memory and call `save()`.
 ```java
 private void saveGame() {
     //update memory (where you are now)
@@ -435,3 +437,39 @@ private void saveGame() {
     System.out.println("memory saved");
 }
 ```
+
+### Scripting
+
+![Scripting](img/scripting.png)
+
+Allow to add game behavior via the script language JavaScript while designing the map.
+
+In [Tiled](https://www.mapeditor.org/) create MapObjects with properties representing scripts.
+
+![Scripting-Screenshot](img/scripting-screenshot.png)
+
+Put bindings to access in JavaScript your Java instances.
+Later, retrieve the script from a MapObject's properties and call `eval`-method.
+```java
+this.scriptEngine = new GameScriptEngine();
+this.scriptEngine.putBinding("game", this);
+
+//later
+String script = mapObject.getProperties().getProperty("onPlayerTouch");
+scriptEngine.eval(script, mapObject);
+```
+
+### Game Overview
+
+All game related classes in one diagram:
+
+![Game Diagram](img/game-diagram.png)
+
+A recap:
+* Use `GameLoopFrame.loop` to start your game
+* Loop relevant information can be accessed in the game via `GameLoop` interface
+* Implement in your game `input`, `update`, `render` method
+* More complex games could use the `GameMultiplexer` to switch between `Game`s resp. `GameState`s
+* A good starting point could be `TiledGame` because it already implements usual behavior
+* `GameMemory` helps in saving and loading a game
+* `GameScriptEngine` can be used to enable scripting with JavaScript in your game

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import org.mapeditor.core.MapObject;
 import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
@@ -97,11 +98,13 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
     }
     
     private void drawObject(Object obj, int x, int y, boolean secondDraw, Graphics2D g, List<Object> stack) {
+        if (!isExisting(obj))
+            return;
         
         //if second draw and object is tile (map object overdraw solved with y coordinate)
         if(secondDraw && obj instanceof Tile) {
-            Properties properties = getProperties(obj);
             //if second draw then moveBehind has to be true
+            Properties properties = getProperties(obj);
             if(!tileAlwaysOnTopPredicate.test(properties))
                 return;
         }
@@ -144,6 +147,20 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
         }
         return ((MapObject) obj).getProperties();
     }
+    
+    private boolean isExisting(Object obj) {
+        if (obj == null)
+            return false;
+        Properties properties = getProperties(obj);
+        if (properties == null)
+            return true;
+        String existing = properties.getProperty("existing");
+        if (existing != null && existing.equalsIgnoreCase("false"))  // explicitly set to NOT EXISTING
+            return false;
+        return true;
+    }
+    
+    
     
     public static class RenderContext<T> {
         private T object;

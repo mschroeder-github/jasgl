@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.mapeditor.core.MapObject;
-import org.mapeditor.core.Properties;
 import org.mapeditor.core.Tile;
 
 /**
@@ -32,7 +31,7 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
     private Consumer<RenderContext<MapObject>> objectRenderer = (ctx) -> {
         ctx.drawDefault();
     };
-    private Predicate<Properties> tileAlwaysOnTopPredicate = (prop) -> {
+    private Predicate<Tile> tileAlwaysOnTopPredicate = (prop) -> {
         return false;
     };
     
@@ -104,8 +103,7 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
         //if second draw and object is tile (map object overdraw solved with y coordinate)
         if(secondDraw && obj instanceof Tile) {
             //if second draw then moveBehind has to be true
-            Properties properties = getProperties(obj);
-            if(!tileAlwaysOnTopPredicate.test(properties))
+            if(!tileAlwaysOnTopPredicate.test((Tile)obj))
                 return;
         }
         
@@ -141,23 +139,10 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
         }
     }
     
-    private Properties getProperties(Object obj) {
-        if(obj instanceof Tile) {
-            return ((Tile) obj).getProperties();
-        }
-        return ((MapObject) obj).getProperties();
-    }
-    
     private boolean isExisting(Object obj) {
         if (obj == null)
             return false;
-        Properties properties = getProperties(obj);
-        if (properties == null)
-            return true;
-        String existing = properties.getProperty("existing");
-        if (existing != null && existing.equalsIgnoreCase("false"))  // explicitly set to NOT EXISTING
-            return false;
-        return true;
+        return PropertyUtil.getBoolean(obj, "existing", true);  // NOT EXISTING must be set explicity!
     }
     
     
@@ -271,7 +256,7 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
         this.objectRenderer = objectRenderer;
     }
 
-    public void setTileAlwaysOnTopPredicate(Predicate<Properties> tileAlwaysOnTopPredicate) {
+    public void setTileAlwaysOnTopPredicate(Predicate<Tile> tileAlwaysOnTopPredicate) {
         this.tileAlwaysOnTopPredicate = tileAlwaysOnTopPredicate;
     }
     

@@ -7,6 +7,12 @@ import org.mapeditor.core.Properties;
 import org.mapeditor.core.Property;
 import org.mapeditor.core.Tile;
 
+/**
+ * Util class providing convenience methods for properties management (getter, setter).
+ * 
+ * @author Sven Schwarz
+ */
+
 public class PropertyUtil {
 
     public static Properties getProperties(Object obj) {

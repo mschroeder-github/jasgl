@@ -23,6 +23,7 @@ import org.mapeditor.core.TileSet;
  * methods to access tile and object layer together with the map objects.
  *
  * @author Markus Schr&ouml;der
+ * @author Sven Schwarz
  */
 public class TiledLevelMap extends LevelMap {
 
@@ -275,17 +276,13 @@ public class TiledLevelMap extends LevelMap {
         List<MapObject> objects = new ArrayList<>();
         for(MapObject mo : layer.getObjects()) {
             double mox = mo.getX();
-            double moy;
-            if(mo.getTile() != null) {
-                //correct y coord
-                moy = mo.getY();
-            } else {
-                //have to add heigh
-                moy = mo.getY() + mo.getHeight();
-            }
+            double moy = mo.getY();
             
             int moGridX = (int)(mox / map.getTileWidth());
             int moGridY = (int)(moy / map.getTileHeight());
+
+            // correction: y is 1 tileheight too big
+            moGridY--;
 
             if(moGridX == gridX && moGridY == gridY) {
                 objects.add(mo);

@@ -19,6 +19,7 @@ import org.mapeditor.core.Tile;
  * Renders tile stacked and row based with map objects (having tiles) and sprites in between based
  * on y-coordinate.
  * @author Markus Schr&ouml;der
+ * @author Sven Schwarz
  */
 public class StackRowBasedOrthogonalLevelMapRenderer {
     
@@ -115,7 +116,6 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
                         new Point(x,y), new Point(x*tile.getWidth(),y*tile.getHeight()), 
                         new Dimension(tile.getWidth(), tile.getHeight()), 
                         secondDraw, g, stack);
-                
                 tileRenderer.accept(ctx);
             }
         }
@@ -133,7 +133,6 @@ public class StackRowBasedOrthogonalLevelMapRenderer {
                         new Point(x,y), new Point((int) mapObject.getX(),(int) mapObject.getY()), 
                         new Dimension(mapObject.getWidth().intValue(), mapObject.getHeight().intValue()), 
                         secondDraw, g, stack);
-                
                 objectRenderer.accept(ctx);
             }
         }

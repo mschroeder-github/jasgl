@@ -14,6 +14,7 @@ In contrast to similar projects, this library tries to keep it simple and stupid
 	- [Sprite](#sprite)
 		- [Interfaces](#interfaces)
 	- [Animator](#animator)
+	- [Scene](#scene)
 	- [Positioner](#positioner)
 	- [Intersection & Collision](#intersection-collision)
 	- [Tiled Map Basics](#tiled-map-basics)
@@ -167,13 +168,29 @@ Sprites can implement interfaces when they have certain behavior.
 
 ### Animator
 
-![Spritesheet](img/animation.png)
+![Animation](img/animation.png)
 
 An animator changes image frames to create an animation.
 
 * *`Animator`*
   * *`FrameAnimator`* is an animator that changes frames (int).
     * `SequentialFixedIntervalFrameAnimator` is an frame animator that changes frames in a fixed time interval and in a given sequence (e.g. 1,5,2,4).
+
+### Scene
+
+![Scene](img/scene.png)
+
+In a scene you define what happens in your level. This is a usual way to tell a
+story in scenes.
+
+* `Scene` is just a list of `SceneAct`s.
+* `SceneAct` is just a reference to a java method together with parameters.
+* `SceneBuilder` is used to build a `Scene` that is later played by the `ScenePlayer`.
+* `ScenePlayer` plays a `Scene`.
+
+Inherit from `SceneBuilder` to define custom scene acts.
+Inherit from `ScenePlayer` to implement what will happen in your game when the
+act is played.
 
 ### Positioner
 
@@ -182,7 +199,8 @@ An animator changes image frames to create an animation.
 A positioner moves `Sprite`s in the game, maybe based on input.
 
 * *`Positioner`* changes positions of given sprites. Can also start and stop animation based on positioning (e.g. walking).
-  * `RpgMakerCharPositioner` works like the one implemented in rpg maker. Moves the character left,up,right,down
+  * *`InputBasedPositioner`* The positioner moves sprites based on input (e.g. key pressed or mouse clicked).
+    * `RpgMakerCharPositioner` works like the one implemented in rpg maker. Moves the character left,up,right,down
      in a grid. While walking the correct animation of a `RpgMakerCharSprite` is played.
 
 ### Intersection & Collision

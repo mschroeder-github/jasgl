@@ -200,7 +200,7 @@ public class GameLoopFrame extends javax.swing.JFrame implements GameLoop {
         private List<KeyEvent> keyEvents = new ArrayList<>();
         
         //know what is pressed (now)
-        private boolean[] pressed = new boolean[9999];
+        private boolean[] pressed = new boolean[70000];
         
         @Override
         public boolean hold(int keyCode) {
